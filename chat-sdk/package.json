@@ -1,0 +1,24 @@
+{
+  "name": "chat-sdk",
+  "version": "1.0.0",
+  "description": "React Native chat SDK — Firestore-backed real-time messaging",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@react-native-firebase/app": ">=21.0.0",
+    "@react-native-firebase/firestore": ">=21.0.0",
+    "@react-native-firebase/messaging": ">=21.0.0",
+    "@react-native-firebase/storage": ">=21.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.72.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "typescript": "^5.8.0"
+  }
+}
