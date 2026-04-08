@@ -1,7 +1,15 @@
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import { db, firestoreReady } from './firebase';
-import type { Chat, ChatDoc, Message, MessageDoc } from './types';
+import type {
+  Chat,
+  ChatBookingMeta,
+  ChatDoc,
+  ChatParticipantRole,
+  ChatThreadType,
+  Message,
+  MessageDoc,
+} from './types';
 
 const CHATS = 'chats';
 const MESSAGES = 'messages';
@@ -53,108 +61,42 @@ function ensureDb(): boolean {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getDemoMessagesForChat(chatId: string): Message[] {
-  // Extract partner info from chatId to provide contextual demo messages
-  if (chatId.includes('priya_sharma')) {
-    return [
-      {
-        messageId: 'priya-1',
-        text: 'Hi! I saw your profile and found it really interesting 😊',
-        senderId: 'priya_sharma',
-        senderName: 'Priya Sharma',
-        createdAt: new Date(Date.now() - 300000), // 5 minutes ago
-        readBy: ['priya_sharma'],
-      },
-      {
-        messageId: 'priya-2',
-        text: 'I love that you enjoy traveling! I just got back from Goa.',
-        senderId: 'priya_sharma',
-        senderName: 'Priya Sharma',
-        createdAt: new Date(Date.now() - 240000), // 4 minutes ago
-        readBy: ['priya_sharma'],
-      },
-      {
-        messageId: 'priya-3',
-        text: 'Would love to know more about your hobbies! 🌟',
-        senderId: 'priya_sharma',
-        senderName: 'Priya Sharma',
-        createdAt: new Date(Date.now() - 180000), // 3 minutes ago
-        readBy: ['priya_sharma'],
-      },
-    ];
-  }
-  
-  if (chatId.includes('rahul_verma')) {
-    return [
-      {
-        messageId: 'rahul-1',
-        text: 'Hey! Thanks for connecting with me.',
-        senderId: 'rahul_verma',
-        senderName: 'Rahul Verma',
-        createdAt: new Date(Date.now() - 3600000), // 1 hour ago
-        readBy: ['rahul_verma'],
-      },
-      {
-        messageId: 'rahul-2',
-        text: 'I noticed we both work in tech. What kind of projects do you work on?',
-        senderId: 'rahul_verma',
-        senderName: 'Rahul Verma',
-        createdAt: new Date(Date.now() - 3300000), // 55 minutes ago
-        readBy: ['rahul_verma'],
-      },
-    ];
-  }
-  
-  // Default demo messages for any other chat
-  return [
-    {
-      messageId: 'demo-1',
-      text: 'Hello! This is a demo conversation.',
-      senderId: 'demo_partner',
-      senderName: 'Demo Partner',
-      createdAt: new Date(Date.now() - 120000), // 2 minutes ago
-      readBy: ['demo_partner'],
-    },
-    {
-      messageId: 'demo-2',
-      text: 'You can send messages and they will appear here instantly in demo mode!',
-      senderId: 'demo_partner',
-      senderName: 'Demo Partner',
-      createdAt: new Date(Date.now() - 60000), // 1 minute ago
-      readBy: ['demo_partner'],
-    },
-    {
-      messageId: 'demo-3',
-      text: 'Configure Firestore security rules to enable real-time chat functionality.',
-      senderId: 'demo_partner',
-      senderName: 'Demo Partner',
-      createdAt: new Date(),
-      readBy: ['demo_partner'],
-    },
-  ];
-}
-
-function buildChatId(userId: string, partnerId: string): string {
-  return `user_${userId}_partner_${partnerId}`;
-}
-
 /** Optional thread metadata from the host app (e.g. Postgres connection / booking APIs). */
 export type SendMessageThreadContext = {
+  bookingId?: number;
+  threadType?: ChatThreadType;
   participantIds: string[];
   participantNames?: Record<string, string>;
+  participantRoles?: Record<string, ChatParticipantRole>;
+  bookingMeta?: ChatBookingMeta;
 };
 
 function normalizeParticipantId(id: string | number): string {
   return String(id).trim();
 }
 
+function buildBookingThreadId(
+  bookingId: number,
+  participantA: string | number,
+  participantB: string | number,
+): string {
+  const normalized = uniqueParticipantIds([participantA, participantB]).sort();
+  if (normalized.length !== 2) {
+    throw new Error('[chat-sdk] buildBookingThreadId requires exactly two participants.');
+  }
+  return `booking_${bookingId}_${normalized[0]}_${normalized[1]}`;
+}
+
 /**
- * Canonical Firestore thread id for app user ↔ partner (same as {@link createOrGetChat}).
- * Use when the backend returns `connectionId` / UUID but messages live under
- * `user_<userId>_partner_<partnerId>`.
+ * Canonical Firestore thread id for booking-scoped participant pairs.
  */
-export function getUserPartnerChatId(appUserId: string, partnerId: string): string {
-  return buildChatId(
+export function getUserPartnerChatId(
+  bookingId: number,
+  appUserId: string,
+  partnerId: string,
+): string {
+  return buildBookingThreadId(
+    bookingId,
     normalizeParticipantId(appUserId),
     normalizeParticipantId(partnerId),
   );
@@ -181,13 +123,17 @@ function toChatModel(id: string, doc: ChatDoc | undefined): Chat {
     safe.participantNames && typeof safe.participantNames === 'object'
       ? safe.participantNames
       : {};
+  const participantRoles =
+    safe.participantRoles && typeof safe.participantRoles === 'object'
+      ? safe.participantRoles
+      : {};
   return {
     chatId: id,
-    type: safe.type ?? 'user-partner',
-    userId: safe.userId ?? '',
-    partnerId: safe.partnerId ?? '',
+    bookingId: typeof safe.bookingId === 'number' ? safe.bookingId : 0,
+    threadType: safe.threadType ?? 'user-partner',
     participantIds,
     participantNames,
+    participantRoles,
     lastMessage: typeof safe.lastMessage === 'string' ? safe.lastMessage : '',
     lastMessageAt: safe.lastMessageAt?.toDate() ?? new Date(),
     unreadCount:
@@ -195,6 +141,10 @@ function toChatModel(id: string, doc: ChatDoc | undefined): Chat {
         ? safe.unreadCount
         : {},
     createdAt: safe.createdAt?.toDate() ?? new Date(),
+    bookingMeta:
+      safe.bookingMeta && typeof safe.bookingMeta === 'object'
+        ? safe.bookingMeta
+        : {},
   };
 }
 
@@ -216,21 +166,29 @@ function toMessageModel(id: string, doc: MessageDoc | undefined): Message {
 // ---------------------------------------------------------------------------
 
 /**
- * Creates a new chat thread if one doesn't exist for the (userId, partnerId)
- * pair, otherwise returns the existing chatId.
+ * Creates a booking-scoped chat thread if one doesn't exist, otherwise returns
+ * the existing deterministic chat id.
  */
-export async function createOrGetChat(
-  userId: string,
-  partnerId: string,
-  names: Record<string, string>,
-): Promise<string> {
-  const chatId = buildChatId(userId, partnerId);
-  
+export async function createOrGetChat(args: {
+  bookingId: number;
+  currentUserId: string;
+  otherParticipantId: string;
+  threadType: ChatThreadType;
+  participantNames: Record<string, string>;
+  participantRoles: Record<string, ChatParticipantRole>;
+  bookingMeta?: ChatBookingMeta;
+}): Promise<string> {
+  const bookingId = Number(args.bookingId);
+  const currentUserId = normalizeParticipantId(args.currentUserId);
+  const otherParticipantId = normalizeParticipantId(args.otherParticipantId);
+  const participantIds = uniqueParticipantIds([currentUserId, otherParticipantId]).sort();
+  const chatId = buildBookingThreadId(bookingId, currentUserId, otherParticipantId);
+
   if (!ensureDb()) {
-    console.warn('[chat-sdk] createOrGetChat: Firestore not ready, returning chatId for demo mode');
+    console.warn('[chat-sdk] createOrGetChat: Firestore not ready.');
     return chatId;
   }
-  
+
   try {
     const chatRef = db!.collection(CHATS).doc(chatId);
     const snap = await chatRef.get();
@@ -239,20 +197,21 @@ export async function createOrGetChat(
 
     const now = firestore.FieldValue.serverTimestamp();
     await chatRef.set({
-      type: 'user-partner',
-      userId,
-      partnerId,
-      participantIds: [userId, partnerId],
-      participantNames: names,
+      bookingId,
+      threadType: args.threadType,
+      participantIds,
+      participantNames: args.participantNames,
+      participantRoles: args.participantRoles,
       lastMessage: '',
       lastMessageAt: now,
-      unreadCount: { [userId]: 0, [partnerId]: 0 },
+      unreadCount: Object.fromEntries(participantIds.map((id) => [id, 0])),
       createdAt: now,
+      bookingMeta: args.bookingMeta ?? {},
     });
 
     return chatId;
   } catch (error) {
-    console.warn('[chat-sdk] createOrGetChat: Firestore error, returning chatId for demo mode:', error);
+    console.warn('[chat-sdk] createOrGetChat: Firestore error:', error);
     return chatId;
   }
 }
@@ -321,6 +280,10 @@ export async function sendMessage(
       ...(data?.participantNames ?? {}),
       ...threadNames,
     };
+    const mergedRoles: Record<string, ChatParticipantRole> = {
+      ...(data?.participantRoles ?? {}),
+      ...(thread?.participantRoles ?? {}),
+    };
     if (senderName) {
       mergedNames[senderId] = senderName;
     }
@@ -337,7 +300,10 @@ export async function sendMessage(
     if (docParticipantIds.length === 0 && threadParticipantIds.length > 0) {
       patch.participantIds = uniqueParticipantIds([...threadParticipantIds, senderId]);
       patch.participantNames = mergedNames;
-      patch.type = 'user-partner';
+      patch.participantRoles = mergedRoles;
+      patch.threadType = thread?.threadType ?? 'user-partner';
+      patch.bookingId = thread?.bookingId ?? 0;
+      patch.bookingMeta = thread?.bookingMeta ?? {};
     }
 
     // Always merge-set the parent doc: `update()` throws NOT_FOUND if the doc was deleted,
@@ -348,7 +314,10 @@ export async function sendMessage(
       if (!parentPayload.participantIds && effectiveIds.length > 0) {
         parentPayload.participantIds = effectiveIds;
         parentPayload.participantNames = mergedNames;
-        parentPayload.type = 'user-partner';
+        parentPayload.participantRoles = mergedRoles;
+        parentPayload.threadType = thread?.threadType ?? 'user-partner';
+        parentPayload.bookingId = thread?.bookingId ?? 0;
+        parentPayload.bookingMeta = thread?.bookingMeta ?? {};
       }
     }
     batch.set(chatRef, parentPayload, { merge: true });
@@ -398,24 +367,18 @@ export function subscribeToMessages(
           },
           (error) => {
             if (isFirestorePermissionError(error)) {
-              if (__DEV__) {
-                // eslint-disable-next-line no-console
-                console.warn(
-                  '[chat-sdk] subscribeToMessages: permission denied; showing demo thread.',
-                );
-              }
+              console.warn('[chat-sdk] subscribeToMessages: permission denied.');
             } else {
               // eslint-disable-next-line no-console
               console.error('[chat-sdk] subscribeToMessages error:', error);
             }
-            const demoMessages: Message[] = getDemoMessagesForChat(chatId);
-            callback(demoMessages);
+            callback([]);
           },
         );
     } catch (error) {
       console.error('[chat-sdk] subscribeToMessages setup error:', error);
       if (!cancelled) {
-        callback(getDemoMessagesForChat(chatId));
+        callback([]);
       }
     }
   })();
@@ -432,7 +395,8 @@ export function subscribeToMessages(
  */
 export type FirestoreListenOptions = {
   /**
-   * When rules deny reads, invoked instead of `callback([])` so the UI can show demo data.
+   * When rules deny reads, invoked instead of `callback([])` so the host app can
+   * handle the empty/blocked state explicitly.
    */
   onPermissionDenied?: () => void;
 };

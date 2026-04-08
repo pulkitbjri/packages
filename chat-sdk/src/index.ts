@@ -31,6 +31,7 @@ export {
 
 export {
   USE_LIVE_FIRESTORE_CHAT,
+  configureChatSdk,
   firestoreReady,
 } from './firebase';
 
@@ -45,7 +46,11 @@ export { ChatListScreen } from './components/ChatListScreen';
 export { ChatRoomScreen } from './components/ChatRoomScreen';
 export { MessageBubble } from './components/MessageBubble';
 export { ChatInput } from './components/ChatInput';
-export { DEFAULT_CHAT_THEME, resolveTheme } from './components/defaultTheme';
+export {
+  DEFAULT_CHAT_THEME,
+  PARTNER_CHAT_THEME,
+  resolveTheme,
+} from './components/defaultTheme';
 
 // Notification service
 export {

@@ -10,16 +10,15 @@ import firestore from '@react-native-firebase/firestore';
  */
 let _db: ReturnType<typeof firestore> | null = null;
 
-/**
- * Live Firestore chat (listeners + writes) is **opt-in**.
- *
- * - `false` (default): SDK uses demo chat data — no `permission-denied` noise, good for local dev.
- * - `true`: use real Firestore; you **must** deploy rules (see repo `firestore.rules` + `FIRESTORE_SETUP.md`).
- *
- * @example Turn on after rules are published in Firebase Console:
- *   export const USE_LIVE_FIRESTORE_CHAT = true;
- */
-export const USE_LIVE_FIRESTORE_CHAT = true;
+export type ChatSdkConfig = {
+  liveFirestore?: boolean;
+};
+
+const sdkConfig = {
+  liveFirestore: false,
+};
+
+export let USE_LIVE_FIRESTORE_CHAT = sdkConfig.liveFirestore;
 
 try {
   _db = firestore();
@@ -30,12 +29,24 @@ try {
 }
 
 /** True when Firestore initialized and live chat is enabled. */
-export const firestoreReady = Boolean(_db) && USE_LIVE_FIRESTORE_CHAT;
+export let firestoreReady = Boolean(_db) && sdkConfig.liveFirestore;
+
+export function configureChatSdk(config: ChatSdkConfig): void {
+  if (typeof config.liveFirestore === 'boolean') {
+    sdkConfig.liveFirestore = config.liveFirestore;
+  }
+  USE_LIVE_FIRESTORE_CHAT = sdkConfig.liveFirestore;
+  firestoreReady = Boolean(_db) && sdkConfig.liveFirestore;
+}
+
+export function getChatSdkConfig() {
+  return { ...sdkConfig };
+}
 
 if (__DEV__ && _db && !USE_LIVE_FIRESTORE_CHAT) {
   // eslint-disable-next-line no-console
   console.log(
-    '[chat-sdk] Firestore is installed; chat uses demo data. Set USE_LIVE_FIRESTORE_CHAT=true in firebase.ts after deploying Firestore rules.',
+    '[chat-sdk] Firestore is installed; chat remains disabled until the host enables liveFirestore.',
   );
 }
 

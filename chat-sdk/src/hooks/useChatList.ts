@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Chat } from '../types';
 import { subscribeToChats, subscribeToTotalUnread } from '../chatService';
 import { firestoreReady } from '../firebase';
-import { buildDemoChatsForParticipant } from '../demoChatData';
 
 interface UseChatListReturn {
   chats: Chat[];
@@ -16,11 +15,11 @@ export function useChatList(participantId: string | null): UseChatListReturn {
   const [totalUnread, setTotalUnread] = useState(0);
   const usedPermissionFallback = useRef(false);
 
-  const applyDemoAfterPermissionDenied = useCallback((pid: string) => {
+  const applyEmptyAfterPermissionDenied = useCallback(() => {
     if (usedPermissionFallback.current) return;
     usedPermissionFallback.current = true;
-    setChats(buildDemoChatsForParticipant(pid));
-    setTotalUnread(1);
+    setChats([]);
+    setTotalUnread(0);
     setLoading(false);
   }, []);
 
@@ -34,8 +33,8 @@ export function useChatList(participantId: string | null): UseChatListReturn {
     usedPermissionFallback.current = false;
 
     if (!firestoreReady) {
-      setChats(buildDemoChatsForParticipant(participantId));
-      setTotalUnread(1);
+      setChats([]);
+      setTotalUnread(0);
       setLoading(false);
       return;
     }
@@ -46,8 +45,7 @@ export function useChatList(participantId: string | null): UseChatListReturn {
     let unsubUnread: (() => void) | null = null;
 
     try {
-      const onPermissionDenied = () =>
-        applyDemoAfterPermissionDenied(participantId);
+      const onPermissionDenied = () => applyEmptyAfterPermissionDenied();
 
       unsubChats = subscribeToChats(
         participantId,
@@ -65,15 +63,15 @@ export function useChatList(participantId: string | null): UseChatListReturn {
       });
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.warn('[useChatList] Firestore subscription failed, using demo data:', error);
-      applyDemoAfterPermissionDenied(participantId);
+      console.warn('[useChatList] Firestore subscription failed:', error);
+      applyEmptyAfterPermissionDenied();
     }
 
     return () => {
       if (unsubChats) unsubChats();
       if (unsubUnread) unsubUnread();
     };
-  }, [participantId, applyDemoAfterPermissionDenied]);
+  }, [participantId, applyEmptyAfterPermissionDenied]);
 
   return { chats, loading, totalUnread };
 }

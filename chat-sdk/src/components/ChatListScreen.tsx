@@ -45,6 +45,24 @@ function getOtherPartyName(
   return 'Unknown';
 }
 
+function getOtherPartyRole(chat: Chat, currentUserId: string): string {
+  for (const [id, role] of Object.entries(chat.participantRoles ?? {})) {
+    if (id !== currentUserId) {
+      return role?.toUpperCase?.() ?? 'CHAT';
+    }
+  }
+  return 'CHAT';
+}
+
+function getBookingContext(chat: Chat): string {
+  const parts = [
+    chat.bookingMeta?.eventName,
+    chat.bookingMeta?.eventDate,
+    chat.bookingMeta?.status,
+  ].filter(Boolean);
+  return parts.join(' · ') || `Booking #${chat.bookingId}`;
+}
+
 // ---------------------------------------------------------------------------
 // Chat Row
 // ---------------------------------------------------------------------------
@@ -58,6 +76,8 @@ interface ChatRowProps {
 
 const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }) => {
   const otherName = getOtherPartyName(chat, currentUserId);
+  const otherRole = getOtherPartyRole(chat, currentUserId);
+  const bookingContext = getBookingContext(chat);
   const unread = chat.unreadCount?.[currentUserId] ?? 0;
 
   return (
@@ -72,19 +92,27 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
       </View>
       <View style={styles.rowContent}>
         <View style={styles.rowTop}>
-          <Text
-            style={[
-              styles.name,
-              { color: theme.text },
-              unread > 0 && styles.nameBold,
-            ]}
-            numberOfLines={1}>
-            {otherName}
-          </Text>
+          <View style={styles.nameGroup}>
+            <Text
+              style={[
+                styles.name,
+                { color: theme.text },
+                unread > 0 && styles.nameBold,
+              ]}
+              numberOfLines={1}>
+              {otherName}
+            </Text>
+            <View style={[styles.rolePill, { backgroundColor: theme.receivedBubble }]}>
+              <Text style={[styles.rolePillText, { color: theme.primary }]}>{otherRole}</Text>
+            </View>
+          </View>
           <Text style={[styles.time, { color: theme.timestamp }]}>
             {formatRelativeTime(chat.lastMessageAt)}
           </Text>
         </View>
+        <Text style={[styles.bookingContext, { color: theme.timestamp }]} numberOfLines={1}>
+          {bookingContext}
+        </Text>
         <View style={styles.rowBottom}>
           <Text
             style={[
@@ -126,7 +154,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
         <ChatRow
           chat={item}
           currentUserId={currentUserId}
-          onPress={() => onChatPress(item.chatId, otherName)}
+          onPress={() => onChatPress(item, otherName)}
           theme={theme}
         />
       );
@@ -230,17 +258,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
+  nameGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+    gap: 8,
+  },
   name: {
     fontSize: 16,
     fontWeight: '500',
-    flex: 1,
-    marginRight: 8,
+    flexShrink: 1,
   },
   nameBold: {
     fontWeight: '700',
   },
+  rolePill: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  rolePillText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
   time: {
     fontSize: 12,
+  },
+  bookingContext: {
+    fontSize: 12,
+    marginBottom: 4,
   },
   rowBottom: {
     flexDirection: 'row',

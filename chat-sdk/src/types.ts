@@ -1,20 +1,33 @@
 import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
+export type ChatThreadType = 'user-partner' | 'user-cm' | 'partner-cm';
+export type ChatParticipantRole = 'user' | 'partner' | 'cm';
+
+export interface ChatBookingMeta {
+  eventName?: string;
+  category?: string;
+  status?: string;
+  eventDate?: string;
+  packageName?: string;
+  city?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Firestore document shapes
 // ---------------------------------------------------------------------------
 
 export interface Chat {
   chatId: string;
-  type: 'user-partner';
-  userId: string;
-  partnerId: string;
+  bookingId: number;
+  threadType: ChatThreadType;
   participantIds: string[];
   participantNames: Record<string, string>;
+  participantRoles: Record<string, ChatParticipantRole>;
   lastMessage: string;
   lastMessageAt: Date;
   unreadCount: Record<string, number>;
   createdAt: Date;
+  bookingMeta: ChatBookingMeta;
 }
 
 export interface Message {
@@ -28,19 +41,20 @@ export interface Message {
 }
 
 // ---------------------------------------------------------------------------
-// Firestore raw document (Timestamps before conversion)
+// Firestore raw document (timestamps before conversion)
 // ---------------------------------------------------------------------------
 
 export interface ChatDoc {
-  type: 'user-partner';
-  userId: string;
-  partnerId: string;
+  bookingId: number;
+  threadType: ChatThreadType;
   participantIds: string[];
   participantNames: Record<string, string>;
+  participantRoles: Record<string, ChatParticipantRole>;
   lastMessage: string;
   lastMessageAt: FirebaseFirestoreTypes.Timestamp;
   unreadCount: Record<string, number>;
   createdAt: FirebaseFirestoreTypes.Timestamp;
+  bookingMeta?: ChatBookingMeta;
 }
 
 export interface MessageDoc {
@@ -79,8 +93,8 @@ export interface ChatTheme {
 export interface ChatListScreenProps {
   currentUserId: string;
   currentUserName: string;
-  currentUserRole: 'user' | 'partner';
-  onChatPress: (chatId: string, otherPartyName: string) => void;
+  currentUserRole: ChatParticipantRole;
+  onChatPress: (chat: Chat, otherPartyName: string) => void;
   theme?: Partial<ChatTheme>;
 }
 
@@ -96,16 +110,11 @@ export interface ChatRoomScreenProps {
   currentUserId: string;
   currentUserName: string;
   otherPartyName: string;
-  /** Backend / list user id for the other party (e.g. `userId` from GET /partners/me/users). Used to seed Firestore `participantIds`. */
+  otherPartyRole?: ChatParticipantRole;
+  bookingId?: number;
+  bookingLabel?: string;
   otherUserId?: string;
-  /**
-   * Optional explicit participant id list from backend (same strings as Firestore rules / JWT).
-   * When set, merged with `currentUserId` for thread context.
-   */
   threadParticipantIds?: string[];
-  /**
-   * Load the message list from the REST API while sends still go through Firestore (when configured).
-   */
   loadMessagesViaApi?: {
     fetchPage: ChatMessagesFetchPageFn;
     pollIntervalMs?: number;

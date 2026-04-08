@@ -1,20 +1,10 @@
-import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
-import type { Message } from '../types';
+import { useCallback, useState } from 'react';
 import {
   sendMessage,
   uploadChatImage,
   type SendMessageThreadContext,
 } from '../chatService';
 import { firestoreReady } from '../firebase';
-import { devMessagesByChatId } from '../devChatStore';
-
-function getDevThread(chatId: string): Message[] {
-  return devMessagesByChatId[chatId] ?? [];
-}
-
-function setDevThread(chatId: string, msgs: Message[]) {
-  devMessagesByChatId[chatId] = msgs;
-}
 
 /**
  * Firestore send/upload only (no message subscription). Used with REST-backed message lists.
@@ -26,8 +16,6 @@ export function useFirestoreChatMessaging(
   thread: SendMessageThreadContext | null | undefined,
   options?: {
     onSendComplete?: () => void | Promise<void>;
-    /** When set, dev-mode (no Firestore) updates sync into the parent message state */
-    syncDevMessages?: Dispatch<SetStateAction<Message[]>>;
   },
 ): {
   sending: boolean;
@@ -36,7 +24,6 @@ export function useFirestoreChatMessaging(
 } {
   const [sending, setSending] = useState(false);
   const onSendComplete = options?.onSendComplete;
-  const syncDev = options?.syncDevMessages;
 
   const send = useCallback(
     async (text: string) => {
@@ -44,19 +31,7 @@ export function useFirestoreChatMessaging(
       setSending(true);
       try {
         if (!firestoreReady) {
-          const newMsg: Message = {
-            messageId: `dev_${Date.now()}_${Math.random().toString(16).slice(2)}`,
-            senderId: currentUserId,
-            senderName: currentUserName,
-            text: text.trim(),
-            createdAt: new Date(),
-            readBy: [currentUserId],
-          };
-          const prev = getDevThread(chatId);
-          const next = [...prev, newMsg];
-          setDevThread(chatId, next);
-          syncDev?.(next);
-          await onSendComplete?.();
+          console.warn('[chat-sdk] send skipped because Firestore chat is not enabled.');
           return;
         }
 
@@ -73,7 +48,7 @@ export function useFirestoreChatMessaging(
         setSending(false);
       }
     },
-    [chatId, currentUserId, currentUserName, thread, onSendComplete, syncDev],
+    [chatId, currentUserId, currentUserName, thread, onSendComplete],
   );
 
   const sendImage = useCallback(
@@ -82,19 +57,7 @@ export function useFirestoreChatMessaging(
       setSending(true);
       try {
         if (!firestoreReady) {
-          const newMsg: Message = {
-            messageId: `dev_${Date.now()}_${Math.random().toString(16).slice(2)}`,
-            senderId: currentUserId,
-            senderName: currentUserName,
-            text: caption?.trim() ? caption.trim() : '📷 Photo',
-            createdAt: new Date(),
-            readBy: [currentUserId],
-          };
-          const prev = getDevThread(chatId);
-          const next = [...prev, newMsg];
-          setDevThread(chatId, next);
-          syncDev?.(next);
-          await onSendComplete?.();
+          console.warn('[chat-sdk] image send skipped because Firestore chat is not enabled.');
           return;
         }
 
@@ -112,7 +75,7 @@ export function useFirestoreChatMessaging(
         setSending(false);
       }
     },
-    [chatId, currentUserId, currentUserName, thread, onSendComplete, syncDev],
+    [chatId, currentUserId, currentUserName, thread, onSendComplete],
   );
 
   return { send, sendImage, sending };
