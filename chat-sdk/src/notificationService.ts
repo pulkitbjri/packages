@@ -1,5 +1,20 @@
-import messaging from '@react-native-firebase/messaging';
-import { Platform } from 'react-native';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+
+export type PushNotificationMessage = {
+  title?: string;
+  body?: string;
+  data?: Record<string, string>;
+};
+
+function normalizeRemoteMessage(
+  msg: FirebaseMessagingTypes.RemoteMessage,
+): PushNotificationMessage {
+  return {
+    title: msg.notification?.title,
+    body: msg.notification?.body,
+    data: msg.data as Record<string, string> | undefined,
+  };
+}
 
 /**
  * Requests push notification permissions from the user.
@@ -46,35 +61,23 @@ export function onTokenRefresh(
  * Returns an unsubscribe function.
  */
 export function onForegroundMessage(
-  callback: (remoteMessage: {
-    title?: string;
-    body?: string;
-    data?: Record<string, string>;
-  }) => void,
+  callback: (remoteMessage: PushNotificationMessage) => void,
 ): () => void {
   return messaging().onMessage((msg) => {
-    callback({
-      title: msg.notification?.title,
-      body: msg.notification?.body,
-      data: msg.data as Record<string, string> | undefined,
-    });
+    callback(normalizeRemoteMessage(msg));
   });
 }
 
 /**
  * Handles the case when the user taps a notification while the app is in
- * background (not killed). The callback receives the chatId to navigate to.
+ * background (not killed).
  * Returns an unsubscribe function.
  */
 export function onNotificationOpenedApp(
-  navigate: (chatId: string, otherPartyName: string) => void,
+  callback: (remoteMessage: PushNotificationMessage) => void,
 ): () => void {
   return messaging().onNotificationOpenedApp((msg) => {
-    const chatId = msg.data?.chatId as string | undefined;
-    const otherPartyName = (msg.data?.senderName as string) ?? 'Chat';
-    if (chatId) {
-      navigate(chatId, otherPartyName);
-    }
+    callback(normalizeRemoteMessage(msg));
   });
 }
 
@@ -82,14 +85,8 @@ export function onNotificationOpenedApp(
  * Checks if the app was opened from a killed state by tapping a
  * notification. Call once on app launch.
  */
-export async function getInitialNotification(): Promise<{
-  chatId: string;
-  otherPartyName: string;
-} | null> {
+export async function getInitialNotification(): Promise<PushNotificationMessage | null> {
   const msg = await messaging().getInitialNotification();
-  if (!msg?.data?.chatId) return null;
-  return {
-    chatId: msg.data.chatId as string,
-    otherPartyName: (msg.data.senderName as string) ?? 'Chat',
-  };
+  if (!msg) return null;
+  return normalizeRemoteMessage(msg);
 }

@@ -61,3 +61,4 @@ export {
   onNotificationOpenedApp,
   getInitialNotification,
 } from './notificationService';
+export type { PushNotificationMessage } from './notificationService';
