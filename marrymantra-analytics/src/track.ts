@@ -1,4 +1,9 @@
-import analytics from '@react-native-firebase/analytics';
+import {
+  getAnalytics,
+  logEvent,
+  logScreenView,
+  setDefaultEventParameters,
+} from '@react-native-firebase/analytics';
 
 export type AnalyticsAppName = 'partner' | 'user';
 
@@ -14,7 +19,7 @@ export async function initAnalytics(appName: AnalyticsAppName): Promise<void> {
   }
   initialized = true;
   try {
-    await analytics().setDefaultEventParameters({
+    await setDefaultEventParameters(getAnalytics(), {
       app_name: appName,
     });
   } catch {
@@ -46,7 +51,7 @@ export async function trackScreenView(
   screenClass?: string,
 ): Promise<void> {
   try {
-    await analytics().logScreenView({
+    await logScreenView(getAnalytics(), {
       screen_name: screenName,
       screen_class: screenClass ?? screenName,
     });
@@ -60,7 +65,7 @@ export async function trackEvent(
   params?: Record<string, string | number | boolean>,
 ): Promise<void> {
   try {
-    await analytics().logEvent(name, sanitizeParams(params));
+    await logEvent(getAnalytics(), name, sanitizeParams(params));
   } catch {
     // ignore
   }
