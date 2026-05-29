@@ -105,6 +105,13 @@ export type ChatMessagesFetchPageFn = (args: {
   after: string | null;
 }) => Promise<{ messages: Message[]; nextCursor: string | null }>;
 
+/** Host-provided sender for POST /api/v1/chat/{chatId}/messages. */
+export type ChatSendMessageFn = (args: {
+  chatId: string;
+  text: string;
+  imageUrl?: string;
+}) => Promise<void>;
+
 export interface ChatRoomScreenProps {
   chatId: string;
   currentUserId: string;
@@ -117,6 +124,7 @@ export interface ChatRoomScreenProps {
   threadParticipantIds?: string[];
   loadMessagesViaApi?: {
     fetchPage: ChatMessagesFetchPageFn;
+    sendMessage?: ChatSendMessageFn;
     pollIntervalMs?: number;
     limit?: number;
   };

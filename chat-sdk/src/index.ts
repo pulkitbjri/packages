@@ -8,6 +8,7 @@ export type {
   ChatListScreenProps,
   ChatRoomScreenProps,
   ChatMessagesFetchPageFn,
+  ChatSendMessageFn,
 } from './types';
 
 export type { ChatMessagesApiNameContext } from './chatMessagesApi';

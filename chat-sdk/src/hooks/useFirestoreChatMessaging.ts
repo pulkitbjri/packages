@@ -5,9 +5,10 @@ import {
   type SendMessageThreadContext,
 } from '../chatService';
 import { firestoreReady } from '../firebase';
+import type { ChatSendMessageFn } from '../types';
 
 /**
- * Firestore send/upload only (no message subscription). Used with REST-backed message lists.
+ * Chat send/upload hook. Uses REST when sendViaApi is provided; otherwise writes to Firestore.
  */
 export function useFirestoreChatMessaging(
   chatId: string | null,
@@ -16,6 +17,7 @@ export function useFirestoreChatMessaging(
   thread: SendMessageThreadContext | null | undefined,
   options?: {
     onSendComplete?: () => void | Promise<void>;
+    sendViaApi?: ChatSendMessageFn;
   },
 ): {
   sending: boolean;
@@ -24,12 +26,19 @@ export function useFirestoreChatMessaging(
 } {
   const [sending, setSending] = useState(false);
   const onSendComplete = options?.onSendComplete;
+  const sendViaApi = options?.sendViaApi;
 
   const send = useCallback(
     async (text: string) => {
       if (!chatId || !text.trim()) return;
       setSending(true);
       try {
+        if (sendViaApi) {
+          await sendViaApi({ chatId, text: text.trim() });
+          await onSendComplete?.();
+          return;
+        }
+
         if (!firestoreReady) {
           console.warn('[chat-sdk] send skipped because Firestore chat is not enabled.');
           return;
@@ -48,7 +57,7 @@ export function useFirestoreChatMessaging(
         setSending(false);
       }
     },
-    [chatId, currentUserId, currentUserName, thread, onSendComplete],
+    [chatId, currentUserId, currentUserName, thread, onSendComplete, sendViaApi],
   );
 
   const sendImage = useCallback(
@@ -56,6 +65,13 @@ export function useFirestoreChatMessaging(
       if (!chatId) return;
       setSending(true);
       try {
+        if (sendViaApi) {
+          const url = await uploadChatImage(chatId, localUri);
+          await sendViaApi({ chatId, text: caption, imageUrl: url });
+          await onSendComplete?.();
+          return;
+        }
+
         if (!firestoreReady) {
           console.warn('[chat-sdk] image send skipped because Firestore chat is not enabled.');
           return;
@@ -75,7 +91,7 @@ export function useFirestoreChatMessaging(
         setSending(false);
       }
     },
-    [chatId, currentUserId, currentUserName, thread, onSendComplete],
+    [chatId, currentUserId, currentUserName, thread, onSendComplete, sendViaApi],
   );
 
   return { send, sendImage, sending };

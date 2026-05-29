@@ -109,6 +109,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
     displayName,
     threadForSend,
     {
+      sendViaApi: useApiList ? loadMessagesViaApi?.sendMessage : undefined,
       onSendComplete: useApiList
         ? () => {
             void refetchRef.current();
