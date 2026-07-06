@@ -1,6 +1,6 @@
 # chat-sdk
 
-Shared React Native chat UI and Firestore helpers for consumer and partner apps.
+Shared React Native chat UI and backend REST/WebSocket helpers for consumer and partner apps.
 
 ## Local package
 
@@ -16,4 +16,4 @@ Then run `npm install` in the app.
 
 ## Peer dependencies
 
-See `package.json` for the required `react`, `react-native`, and `@react-native-firebase/*` peers.
+See `package.json` for the required `react`, `react-native`, and Firebase Messaging peers.

@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ChatMessagesFetchPageFn, Message } from '../types';
-import { markMessagesRead } from '../chatService';
-import { firestoreReady } from '../firebase';
+import type { ChatEventSubscribeFn, ChatMessagesFetchPageFn, Message } from '../types';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -19,6 +17,8 @@ export function useChatMessagesApi(
     enabled?: boolean;
     /** Page size for each request (default 50, max 100). */
     limit?: number;
+    subscribeToEvents?: ChatEventSubscribeFn;
+    markRead?: (chatId: string) => Promise<void>;
   },
 ): {
   messages: Message[];
@@ -35,6 +35,8 @@ export function useChatMessagesApi(
   const loadingMore = useRef(false);
   const enabled = options?.enabled !== false;
   const pollMs = options?.pollIntervalMs ?? DEFAULT_POLL_MS;
+  const markRead = options?.markRead;
+  const subscribeToEvents = options?.subscribeToEvents;
   const pageLimit = Math.min(
     Math.max(options?.limit ?? DEFAULT_LIMIT, 1),
     MAX_LIMIT,
@@ -59,10 +61,10 @@ export function useChatMessagesApi(
         });
         setMessages(page);
         setNextCursor(cursor);
-        if (firestoreReady && page.length > 0) {
+        if (markRead && page.length > 0) {
           const last = page[page.length - 1];
           if (String(last.senderId) !== String(currentUserId)) {
-            markMessagesRead(chatId, currentUserId).catch(() => {});
+            markRead(chatId).catch(() => {});
           }
         }
       } finally {
@@ -70,7 +72,7 @@ export function useChatMessagesApi(
         setRefreshing(false);
       }
     },
-    [chatId, currentUserId, enabled, fetchPage, pageLimit],
+    [chatId, currentUserId, enabled, fetchPage, markRead, pageLimit],
   );
 
   useEffect(() => {
@@ -84,6 +86,15 @@ export function useChatMessagesApi(
     }, pollMs);
     return () => clearInterval(t);
   }, [chatId, enabled, pollMs, doFetch]);
+
+  useEffect(() => {
+    if (!chatId || !enabled || !subscribeToEvents) return;
+    return subscribeToEvents((event) => {
+      if (event.type === 'chat_message_created' && event.chat?.chatId === chatId) {
+        void doFetch('poll');
+      }
+    });
+  }, [chatId, enabled, subscribeToEvents, doFetch]);
 
   const refetch = useCallback(async () => {
     await doFetch('pull');

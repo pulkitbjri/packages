@@ -1,4 +1,4 @@
-import type { Message } from './types';
+import type { Chat, ChatParticipantRole, ChatThreadType, Message } from './types';
 
 export type ChatMessagesApiNameContext = {
   currentUserId: string;
@@ -25,8 +25,34 @@ function parseCreatedAt(value: unknown): Date {
   return new Date();
 }
 
+function pickRecord(obj: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = obj[key];
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function pickStringArray(obj: Record<string, unknown>, key: string): string[] {
+  const value = obj[key];
+  return Array.isArray(value)
+    ? value.map((item) => String(item ?? '').trim()).filter(Boolean)
+    : [];
+}
+
+function pickNumber(obj: Record<string, unknown>, keys: string[], fallback = 0): number {
+  for (const key of keys) {
+    const value = obj[key];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return fallback;
+}
+
 /**
- * Maps one API / Firestore-exported message row to {@link Message}.
+ * Maps one backend API message row to {@link Message}.
  * Text: text | message | body | content. Sender: senderId | fromUserId | from | sender | uid | userId.
  */
 export function mapApiRowToMessage(
@@ -51,10 +77,11 @@ export function mapApiRowToMessage(
   return {
     messageId: id,
     senderId: sid,
-    senderName: senderName || '…',
+    senderName: pickString(o, ['senderName', 'senderNameSnapshot']) ?? (senderName || '...'),
     text,
+    imageUrl: pickString(o, ['imageUrl', 'mediaUrl']) ?? undefined,
     createdAt,
-    readBy: [],
+    readBy: pickStringArray(o, 'readBy'),
   };
 }
 
@@ -80,4 +107,44 @@ export function parseChatMessagesApiResponse(
   const nextCursor =
     typeof next === 'string' && next.trim().length > 0 ? next.trim() : null;
   return { messages, nextCursor };
+}
+
+export type ParsedChatThreadsPage = {
+  chats: Chat[];
+  totalUnread: number;
+};
+
+export function mapApiRowToChat(row: unknown): Chat {
+  const o = row && typeof row === 'object' ? (row as Record<string, unknown>) : {};
+  const participantNames = pickRecord(o, 'participantNames') as Record<string, string>;
+  const participantRoles = pickRecord(o, 'participantRoles') as Record<string, ChatParticipantRole>;
+  const unreadCountRaw = pickRecord(o, 'unreadCount');
+  const unreadCount = Object.fromEntries(
+    Object.entries(unreadCountRaw).map(([key, value]) => [key, pickNumber({ value }, ['value'])]),
+  );
+  return {
+    chatId: pickString(o, ['chatId', 'id']) ?? '',
+    bookingId: pickNumber(o, ['bookingId']),
+    threadType: (pickString(o, ['threadType']) ?? 'user-partner') as ChatThreadType,
+    participantIds: pickStringArray(o, 'participantIds'),
+    participantNames,
+    participantRoles,
+    lastMessage: pickString(o, ['lastMessage']) ?? '',
+    lastMessageAt: parseCreatedAt(o.lastMessageAt),
+    unreadCount,
+    createdAt: parseCreatedAt(o.createdAt),
+    bookingMeta: pickRecord(o, 'bookingMeta'),
+  };
+}
+
+export function parseChatThreadsApiResponse(data: unknown): ParsedChatThreadsPage {
+  if (!data || typeof data !== 'object') {
+    return { chats: [], totalUnread: 0 };
+  }
+  const r = data as Record<string, unknown>;
+  const rawList = Array.isArray(r.chats) ? r.chats : [];
+  return {
+    chats: rawList.map(mapApiRowToChat),
+    totalUnread: pickNumber(r, ['totalUnread']),
+  };
 }

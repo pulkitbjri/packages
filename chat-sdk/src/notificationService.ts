@@ -1,4 +1,5 @@
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 export type PushNotificationMessage = {
   title?: string;
@@ -22,6 +23,15 @@ function normalizeRemoteMessage(
  * Returns true if authorised.
  */
 export async function requestNotificationPermission(): Promise<boolean> {
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+    if (status !== PermissionsAndroid.RESULTS.GRANTED) {
+      return false;
+    }
+  }
+
   const authStatus = await messaging().requestPermission();
   return (
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||

@@ -2,45 +2,35 @@
 export type {
   Chat,
   Message,
-  ChatDoc,
-  MessageDoc,
+  ChatParticipantRole,
+  ChatThreadType,
   ChatTheme,
   ChatListScreenProps,
   ChatRoomScreenProps,
   ChatMessagesFetchPageFn,
   ChatSendMessageFn,
+  ChatMediaUploadFn,
+  ChatThreadsFetchFn,
+  ChatEventSubscribeFn,
+  ChatRealtimeEvent,
 } from './types';
 
 export type { ChatMessagesApiNameContext } from './chatMessagesApi';
-export { parseChatMessagesApiResponse, mapApiRowToMessage } from './chatMessagesApi';
-
-// Chat service (Firestore operations)
-export type { FirestoreListenOptions, SendMessageThreadContext } from './chatService';
 export {
-  createOrGetChat,
+  parseChatMessagesApiResponse,
+  mapApiRowToMessage,
+  parseChatThreadsApiResponse,
+  mapApiRowToChat,
+} from './chatMessagesApi';
+
+// Chat id helpers and backward-compatible no-op shims
+export type { SendMessageThreadContext } from './chatService';
+export {
   getUserPartnerChatId,
-  isFirestorePermissionError,
-  isStoragePermissionError,
-  sendMessage,
-  subscribeToMessages,
-  subscribeToChats,
-  markMessagesRead,
-  uploadChatImage,
-  loadEarlierMessages,
-  subscribeToTotalUnread,
 } from './chatService';
 
-export {
-  USE_LIVE_FIRESTORE_CHAT,
-  configureChatSdk,
-  firestoreReady,
-} from './firebase';
-
 // Hooks
-export { useChat } from './hooks/useChat';
-export { useChatList } from './hooks/useChatList';
 export { useChatMessagesApi } from './hooks/useChatMessagesApi';
-export { useFirestoreChatMessaging } from './hooks/useFirestoreChatMessaging';
 
 // UI components
 export { ChatListScreen } from './components/ChatListScreen';

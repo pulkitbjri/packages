@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useMemo, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,68 +11,22 @@ import {
   Platform,
 } from 'react-native';
 import type { ChatRoomScreenProps, Message } from '../types';
-import { useChat } from '../hooks/useChat';
 import { useChatMessagesApi } from '../hooks/useChatMessagesApi';
-import { useFirestoreChatMessaging } from '../hooks/useFirestoreChatMessaging';
+import { useBackendChatMessaging } from '../hooks/useBackendChatMessaging';
 import { resolveTheme } from './defaultTheme';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
-
-function uniquePairIds(a: string, b: string): string[] {
-  const ids = [String(a).trim(), String(b).trim()].filter((id) => id.length > 0);
-  return [...new Set(ids)];
-}
-
-function buildThreadParticipantIds(
-  selfId: string,
-  peerId: string,
-  fromBackend?: string[],
-): string[] {
-  const trimmedBackend =
-    Array.isArray(fromBackend) && fromBackend.length > 0
-      ? fromBackend.map((id) => String(id).trim()).filter((id) => id.length > 0)
-      : [];
-  if (trimmedBackend.length > 0) {
-    const merged = [...trimmedBackend, selfId].filter((id) => id.length > 0);
-    return [...new Set(merged)];
-  }
-  if (peerId) return uniquePairIds(selfId, peerId);
-  return selfId ? [selfId] : [];
-}
 
 export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   chatId,
   currentUserId,
   currentUserName,
   otherPartyName,
-  otherUserId,
-  threadParticipantIds: threadParticipantIdsProp,
   loadMessagesViaApi,
   onBack,
   theme: themeOverride,
 }) => {
   const theme = resolveTheme(themeOverride);
-  // Always pass thread metadata so sendMessage can seed Firestore when the parent
-  // doc has no participantIds (e.g. chatId = backend connectionId).
-  const selfId = String(currentUserId ?? '').trim();
-  const peerId = String(otherUserId ?? '').trim();
-  const threadContext = useMemo(
-    () => ({
-      participantIds: buildThreadParticipantIds(selfId, peerId, threadParticipantIdsProp),
-      participantNames: {
-        ...(selfId ? { [selfId]: (currentUserName || 'You').trim() } : {}),
-        ...(peerId
-          ? { [peerId]: (otherPartyName || '').trim() || 'Customer' }
-          : {}),
-      },
-    }),
-    [selfId, peerId, currentUserName, otherPartyName, threadParticipantIdsProp],
-  );
-
-  const threadForSend =
-    threadContext.participantIds.length > 0 ? threadContext : null;
-  const displayName = currentUserName || 'You';
-
   const useApiList = Boolean(loadMessagesViaApi?.fetchPage);
 
   const noopFetch = useCallback(
@@ -86,30 +40,23 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   const fetchPage = loadMessagesViaApi?.fetchPage ?? noopFetch;
 
   const apiState = useChatMessagesApi(chatId, currentUserId, fetchPage, {
-    enabled: useApiList,
+    enabled: Boolean(chatId),
     pollIntervalMs: loadMessagesViaApi?.pollIntervalMs,
     limit: loadMessagesViaApi?.limit,
+    subscribeToEvents: loadMessagesViaApi?.subscribeToEvents,
+    markRead: loadMessagesViaApi?.markRead,
   });
-
-  const firestoreState = useChat(
-    useApiList ? null : chatId,
-    currentUserId,
-    displayName,
-    threadForSend,
-  );
 
   const refetchRef = useRef(apiState.refetch);
   useEffect(() => {
     refetchRef.current = apiState.refetch;
   }, [apiState.refetch]);
 
-  const messaging = useFirestoreChatMessaging(
+  const messaging = useBackendChatMessaging(
     chatId,
-    currentUserId,
-    displayName,
-    threadForSend,
     {
       sendViaApi: useApiList ? loadMessagesViaApi?.sendMessage : undefined,
+      uploadMedia: useApiList ? loadMessagesViaApi?.uploadMedia : undefined,
       onSendComplete: useApiList
         ? () => {
             void refetchRef.current();
@@ -118,12 +65,12 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
     },
   );
 
-  const messages = useApiList ? apiState.messages : firestoreState.messages;
-  const loading = useApiList ? apiState.loading : firestoreState.loading;
-  const loadMore = useApiList ? apiState.loadMore : firestoreState.loadMore;
-  const hasMore = useApiList ? apiState.hasMore : firestoreState.hasMore;
-  const send = useApiList ? messaging.send : firestoreState.send;
-  const sending = useApiList ? messaging.sending : firestoreState.sending;
+  const messages = apiState.messages;
+  const loading = apiState.loading;
+  const loadMore = apiState.loadMore;
+  const hasMore = apiState.hasMore;
+  const send = messaging.send;
+  const sending = messaging.sending;
 
   const listRef = useRef<FlatList<Message>>(null);
 

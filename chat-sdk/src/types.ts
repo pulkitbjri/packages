@@ -1,5 +1,3 @@
-import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-
 export type ChatThreadType = 'user-partner' | 'user-cm' | 'partner-cm';
 export type ChatParticipantRole = 'user' | 'partner' | 'cm';
 
@@ -13,7 +11,7 @@ export interface ChatBookingMeta {
 }
 
 // ---------------------------------------------------------------------------
-// Firestore document shapes
+// Backend chat model shapes
 // ---------------------------------------------------------------------------
 
 export interface Chat {
@@ -37,32 +35,6 @@ export interface Message {
   text: string;
   imageUrl?: string;
   createdAt: Date;
-  readBy: string[];
-}
-
-// ---------------------------------------------------------------------------
-// Firestore raw document (timestamps before conversion)
-// ---------------------------------------------------------------------------
-
-export interface ChatDoc {
-  bookingId: number;
-  threadType: ChatThreadType;
-  participantIds: string[];
-  participantNames: Record<string, string>;
-  participantRoles: Record<string, ChatParticipantRole>;
-  lastMessage: string;
-  lastMessageAt: FirebaseFirestoreTypes.Timestamp;
-  unreadCount: Record<string, number>;
-  createdAt: FirebaseFirestoreTypes.Timestamp;
-  bookingMeta?: ChatBookingMeta;
-}
-
-export interface MessageDoc {
-  senderId: string;
-  senderName: string;
-  text: string;
-  imageUrl?: string;
-  createdAt: FirebaseFirestoreTypes.Timestamp;
   readBy: string[];
 }
 
@@ -95,6 +67,11 @@ export interface ChatListScreenProps {
   currentUserName: string;
   currentUserRole: ChatParticipantRole;
   onChatPress: (chat: Chat, otherPartyName: string) => void;
+  loadChatsViaApi?: {
+    fetchList: ChatThreadsFetchFn;
+    subscribeToEvents?: ChatEventSubscribeFn;
+    pollIntervalMs?: number;
+  };
   theme?: Partial<ChatTheme>;
 }
 
@@ -110,7 +87,33 @@ export type ChatSendMessageFn = (args: {
   chatId: string;
   text: string;
   imageUrl?: string;
+  mediaObjectPath?: string;
+  mediaContentType?: string;
 }) => Promise<void>;
+
+export type ChatMediaUploadFn = (args: {
+  chatId: string;
+  localUri: string;
+}) => Promise<{
+  imageUrl: string;
+  objectPath?: string;
+  contentType?: string;
+}>;
+
+export type ChatThreadsFetchFn = () => Promise<{
+  chats: Chat[];
+  totalUnread: number;
+}>;
+
+export type ChatRealtimeEvent = {
+  type: string;
+  chat?: Chat;
+  message?: Message;
+};
+
+export type ChatEventSubscribeFn = (
+  onEvent: (event: ChatRealtimeEvent) => void,
+) => () => void;
 
 export interface ChatRoomScreenProps {
   chatId: string;
@@ -125,6 +128,9 @@ export interface ChatRoomScreenProps {
   loadMessagesViaApi?: {
     fetchPage: ChatMessagesFetchPageFn;
     sendMessage?: ChatSendMessageFn;
+    uploadMedia?: ChatMediaUploadFn;
+    subscribeToEvents?: ChatEventSubscribeFn;
+    markRead?: (chatId: string) => Promise<void>;
     pollIntervalMs?: number;
     limit?: number;
   };

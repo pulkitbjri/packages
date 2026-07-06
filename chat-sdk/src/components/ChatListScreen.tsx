@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import type { ChatListScreenProps, Chat, ChatTheme } from '../types';
-import { useChatList } from '../hooks/useChatList';
 import { resolveTheme } from './defaultTheme';
 
 // ---------------------------------------------------------------------------
@@ -142,10 +141,47 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
   currentUserId,
   currentUserRole,
   onChatPress,
+  loadChatsViaApi,
   theme: themeOverride,
 }) => {
   const theme = resolveTheme(themeOverride);
-  const { chats, loading } = useChatList(currentUserId);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [loading, setLoading] = useState(true);
+  const fetchList = loadChatsViaApi?.fetchList;
+  const subscribeToEvents = loadChatsViaApi?.subscribeToEvents;
+  const pollMs = loadChatsViaApi?.pollIntervalMs ?? 10_000;
+
+  const refresh = useCallback(async () => {
+    if (!fetchList) {
+      setChats([]);
+      setLoading(false);
+      return;
+    }
+    const result = await fetchList();
+    setChats(result.chats);
+    setLoading(false);
+  }, [fetchList]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!fetchList || pollMs <= 0) return;
+    const timer = setInterval(() => {
+      void refresh();
+    }, pollMs);
+    return () => clearInterval(timer);
+  }, [fetchList, pollMs, refresh]);
+
+  useEffect(() => {
+    if (!subscribeToEvents) return;
+    return subscribeToEvents((event) => {
+      if (event.type === 'chat_message_created') {
+        void refresh();
+      }
+    });
+  }, [subscribeToEvents, refresh]);
 
   const renderItem = useCallback(
     ({ item }: { item: Chat }) => {
