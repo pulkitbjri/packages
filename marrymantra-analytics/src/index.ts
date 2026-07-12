@@ -1,11 +1,29 @@
 export {
+  init,
   initAnalytics,
   trackEvent,
   trackScreenView,
-  type AnalyticsAppName,
-} from './track';
+  trackClick,
+  trackStep,
+  setUser,
+  clearUser,
+  sanitize,
+} from './engine';
+export type {
+  AnalyticsProvider,
+  EventParams,
+  StepAction,
+  AnalyticsConfig,
+  UserContext,
+} from './types';
+export { createFirebaseProvider } from './firebase';
 export {
   createNavigationStateChangeHandler,
   getActiveRouteName,
 } from './navigation';
-export { AnalyticsEvents, type AnalyticsEventName } from './events';
+export {
+  AnalyticsEvents,
+  Funnels,
+  Steps,
+  type AnalyticsEventName,
+} from './events';

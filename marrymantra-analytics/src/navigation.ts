@@ -1,6 +1,6 @@
 import type { NavigationState } from '@react-navigation/native';
 
-import { trackScreenView } from './track';
+import { trackScreenView } from './engine';
 
 export function getActiveRouteName(
   state: NavigationState | undefined,
@@ -16,7 +16,8 @@ export function getActiveRouteName(
 }
 
 /**
- * Returns an `onStateChange` handler for `NavigationContainer` that logs `screen_view` for the focused route.
+ * Returns an `onStateChange` handler for `NavigationContainer` that logs
+ * `screen_view` for the focused route via the analytics engine.
  */
 export function createNavigationStateChangeHandler(): (
   state: NavigationState | undefined,
