@@ -157,9 +157,14 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
       setLoading(false);
       return;
     }
-    const result = await fetchList();
-    setChats(result.chats);
-    setLoading(false);
+    try {
+      const result = await fetchList();
+      setChats(result.chats);
+    } catch {
+      // leave prior list; clear spinner so API errors don't hang forever
+    } finally {
+      setLoading(false);
+    }
   }, [fetchList]);
 
   useEffect(() => {
