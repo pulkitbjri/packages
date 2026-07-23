@@ -50,7 +50,13 @@ export async function getFCMToken(): Promise<string | null> {
     }
     return await messaging().getToken();
   } catch (error) {
-    console.error('[chat-sdk] getFCMToken error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    // Emulators / cold Play Services often return SERVICE_NOT_AVAILABLE — not an app bug.
+    if (message.includes('SERVICE_NOT_AVAILABLE')) {
+      console.warn('[chat-sdk] getFCMToken unavailable:', message);
+    } else {
+      console.error('[chat-sdk] getFCMToken error:', error);
+    }
     return null;
   }
 }
