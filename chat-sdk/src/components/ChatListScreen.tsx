@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -32,7 +33,11 @@ function formatRelativeTime(date: Date): string {
   return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 }
 
-function getOtherPartyName(chat: Chat, currentUserId: string): string {
+function getOtherPartyName(
+  chat: Chat,
+  currentUserId: string,
+  unknownLabel: string,
+): string {
   const names = chat.participantNames ?? {};
   for (const [id, name] of Object.entries(names)) {
     if (id !== currentUserId) {
@@ -41,7 +46,7 @@ function getOtherPartyName(chat: Chat, currentUserId: string): string {
       if (label) return label;
     }
   }
-  return 'Unknown';
+  return unknownLabel;
 }
 
 function getOtherPartyRole(
@@ -56,11 +61,14 @@ function getOtherPartyRole(
   return null;
 }
 
-function rolePillLabel(role: ChatParticipantRole | null): string {
-  if (role === 'cm') return 'City Manager';
-  if (role === 'partner') return 'Partner';
-  if (role === 'user') return 'Client';
-  return 'Chat';
+function rolePillLabel(
+  role: ChatParticipantRole | null,
+  t: (key: string) => string,
+): string {
+  if (role === 'cm') return t('cityManager');
+  if (role === 'partner') return t('partner');
+  if (role === 'user') return t('client');
+  return t('chat');
 }
 
 function getBookingContext(chat: Chat): string {
@@ -103,7 +111,8 @@ interface ChatRowProps {
 }
 
 const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }) => {
-  const otherName = getOtherPartyName(chat, currentUserId);
+  const { t } = useTranslation('chat');
+  const otherName = getOtherPartyName(chat, currentUserId, t('unknown'));
   const otherRole = getOtherPartyRole(chat, currentUserId);
   const bookingContext = getBookingContext(chat);
   const unread = chat.unreadCount?.[currentUserId] ?? 0;
@@ -139,7 +148,7 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
             </Text>
             <View style={[styles.rolePill, { backgroundColor: theme.receivedBubble }]}>
               <Text style={[styles.rolePillText, { color: theme.primary }]}>
-                {rolePillLabel(otherRole)}
+                {rolePillLabel(otherRole, t)}
               </Text>
             </View>
           </View>
@@ -158,7 +167,7 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
               unread > 0 && { color: theme.text, fontWeight: '500' },
             ]}
             numberOfLines={1}>
-            {chat.lastMessage || 'No messages yet'}
+            {chat.lastMessage || t('noMessagesPreview')}
           </Text>
           {unread > 0 ? (
             <View style={[styles.badge, { backgroundColor: badgeColor }]}>
@@ -222,6 +231,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
   loadChatsViaApi,
   theme: themeOverride,
 }) => {
+  const { t } = useTranslation('chat');
   const theme = resolveTheme(themeOverride);
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -311,7 +321,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
           styles.header,
           { backgroundColor: theme.surface, borderBottomColor: theme.border },
         ]}>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Messages</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>{t('messages')}</Text>
         <View
           style={[
             styles.searchWrap,
@@ -321,7 +331,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
             style={[styles.searchInput, { color: theme.text }]}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search conversations"
+            placeholder={t('searchConversations')}
             placeholderTextColor={theme.timestamp}
             autoCorrect={false}
             clearButtonMode="while-editing"
@@ -329,7 +339,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
         </View>
         <View style={styles.chipRow}>
           <FilterChip
-            label="All"
+            label={t('all')}
             active={roleFilter === 'all'}
             onPress={() => setRoleFilter('all')}
             theme={theme}
@@ -337,13 +347,13 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
           {currentUserRole === 'user' ? (
             <>
               <FilterChip
-                label="Partner"
+                label={t('partner')}
                 active={roleFilter === 'partner'}
                 onPress={() => setRoleFilter('partner')}
                 theme={theme}
               />
               <FilterChip
-                label="City Manager"
+                label={t('cityManager')}
                 active={roleFilter === 'cm'}
                 onPress={() => setRoleFilter('cm')}
                 theme={theme}
@@ -352,21 +362,21 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
           ) : (
             <>
               <FilterChip
-                label="Client"
+                label={t('client')}
                 active={roleFilter === 'user'}
                 onPress={() => setRoleFilter('user')}
                 theme={theme}
               />
               {currentUserRole === 'partner' ? (
                 <FilterChip
-                  label="City Manager"
+                  label={t('cityManager')}
                   active={roleFilter === 'cm'}
                   onPress={() => setRoleFilter('cm')}
                   theme={theme}
                 />
               ) : (
                 <FilterChip
-                  label="Partner"
+                  label={t('partner')}
                   active={roleFilter === 'partner'}
                   onPress={() => setRoleFilter('partner')}
                   theme={theme}
@@ -385,16 +395,16 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
         </View>
       ) : chats.length === 0 ? (
         <View style={styles.center}>
-          <Text style={[styles.emptyTitle, { color: theme.text }]}>No conversations yet</Text>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>{t('noConversations')}</Text>
           <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
             {emptySubtitle}
           </Text>
         </View>
       ) : listEmptyAfterFilter ? (
         <View style={styles.center}>
-          <Text style={[styles.emptyTitle, { color: theme.text }]}>No matches</Text>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>{t('noMatches')}</Text>
           <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-            Try a different search or filter.
+            {t('tryDifferentSearch')}
           </Text>
         </View>
       ) : (

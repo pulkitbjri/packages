@@ -1,0 +1,370 @@
+{
+  "hub": {
+    "title": "पार्टनर हब"
+  },
+  "tabs": {
+    "home": "होम",
+    "bookings": "बुकिंग",
+    "earnings": "कमाई",
+    "profile": "प्रोफ़ाइल",
+    "business": "व्यवसाय",
+    "plans": "प्लान",
+    "chat": "चैट"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "language": "ऐप भाषा",
+    "languageHint": "ऐप के लिए अंग्रेज़ी या हिंदी चुनें",
+    "publicProfile": "सार्वजनिक प्रोफ़ाइल",
+    "logout": "लॉग आउट"
+  },
+  "auth": {
+    "loginTitle": "पार्टनर लॉगिन",
+    "enterMobile": "मोबाइल नंबर दर्ज करें",
+    "sendOtp": "OTP भेजें",
+    "verifyOtp": "OTP सत्यापित करें",
+    "appName": "MarryMantra पार्टनर",
+    "welcomeSubtitle": "स्वागत है! शुरू करते हैं",
+    "partnerLogin": "पार्टनर लॉगिन",
+    "partnerLoginSubtitle": "स्व-ऑनबोर्डिंग और पार्टनर एक्सेस",
+    "cityManagerLogin": "सिटी मैनेजर लॉगिन",
+    "cityManagerLoginSubtitle": "पार्टनर सत्यापित करें और स्वीकृत/रिफंड करें",
+    "termsFooter": "जारी रखकर, आप हमारी",
+    "terms": "नियम और शर्तें",
+    "and": "और",
+    "privacyPolicy": "गोपनीयता नीति",
+    "enterMobileTitle": "अपना मोबाइल\nनंबर दर्ज करें",
+    "enterMobilePlaceholder": "अपना मोबाइल नंबर दर्ज करें",
+    "otpInfo": "हम इस नंबर पर 4-अंकीय कोड भेजेंगे",
+    "getOtp": "OTP प्राप्त करें",
+    "or": "या",
+    "continueWithGoogle": "Google से जारी रखें",
+    "enterCodeTitle": "सत्यापन\nकोड दर्ज करें",
+    "otpSentTo": "हमने +91 {{phone}} पर कोड भेजा है",
+    "enterOtpPlaceholder": "6-अंकीय कोड दर्ज करें",
+    "verify": "सत्यापित करें",
+    "invalidPhoneTitle": "अमान्य फ़ोन नंबर",
+    "invalidPhoneMessage": "कृपया मान्य 10-अंकीय भारतीय मोबाइल नंबर दर्ज करें",
+    "invalidOtpTitle": "अमान्य OTP",
+    "invalidOtpMessage": "कृपया मान्य 6-अंकीय OTP दर्ज करें",
+    "failedSendOtp": "OTP भेजने में विफल",
+    "invalidOtpLogin": "अमान्य OTP",
+    "unsupportedGoogleTitle": "असमर्थित लॉगिन",
+    "unsupportedGoogleMessage": "Google लॉगिन केवल पार्टनर खातों के लिए उपलब्ध है।",
+    "googleNotConfiguredTitle": "Google लॉगिन कॉन्फ़िगर नहीं",
+    "googleNotConfiguredMessage": "पार्टनर ऐप वातावरण में GOOGLE_WEB_CLIENT_ID जोड़ें।",
+    "googleLoginFailed": "Google लॉगिन विफल"
+  },
+  "booking": {
+    "title": "बुकिंग",
+    "details": "बुकिंग विवरण",
+    "empty": "अभी कोई बुकिंग नहीं",
+    "accept": "स्वीकार करें",
+    "reject": "अस्वीकार करें",
+    "overview": "अवलोकन"
+  },
+  "bookingList": {
+    "title": "मेरे असाइनमेंट",
+    "totalOne": "कुल {{count}} असाइनमेंट",
+    "totalOther": "कुल {{count}} असाइनमेंट",
+    "leadGallery": "लीड गैलरी",
+    "activeLeadsOne": "{{count}} सक्रिय लीड",
+    "activeLeadsOther": "{{count}} सक्रिय लीड",
+    "active": "सक्रिय",
+    "filterAll": "सभी",
+    "filterPending": "लंबित",
+    "filterAccepted": "स्वीकृत",
+    "filterClosed": "बंद",
+    "filterLocked": "लॉक",
+    "filterUnlocked": "अनलॉक",
+    "emptyTitle": "अभी कोई असाइनमेंट नहीं",
+    "emptyDefault": "आपकी पार्टनर भूमिका से मेल खाने पर नए अवसर यहाँ दिखेंगे।",
+    "emptyFiltered": "अभी कोई {{parts}} असाइनमेंट नहीं।",
+    "goBack": "वापस जाएँ",
+    "refresh": "असाइनमेंट रिफ्रेश करें",
+    "a11yShowAll": "सभी असाइनमेंट दिखाएँ",
+    "a11yShowStatus": "{{status}} असाइनमेंट दिखाएँ",
+    "a11yShowAllLocks": "सभी लॉक स्थिति दिखाएँ",
+    "a11yShowLocked": "लॉक असाइनमेंट दिखाएँ",
+    "a11yShowUnlocked": "अनलॉक असाइनमेंट दिखाएँ"
+  },
+  "bookingDetail": {
+    "title": "असाइनमेंट\nविवरण",
+    "loading": "असाइनमेंट विवरण लोड हो रहे हैं...",
+    "notFound": "बुकिंग नहीं मिली",
+    "headerUser": "यूज़र",
+    "headerCm": "CM",
+    "tabs": {
+      "overview": "अवलोकन",
+      "timeline": "टाइमलाइन",
+      "proofs": "प्रूफ",
+      "contact": "संपर्क"
+    },
+    "overview": {
+      "premiumAssignment": "प्रीमियम असाइनमेंट",
+      "tokenPaid": "टोकन भुगतान",
+      "schedulePending": "शेड्यूल लंबित",
+      "budget": "बजट",
+      "status": "स्थिति",
+      "source": "स्रोत",
+      "sourceDraft": "ड्राफ्ट",
+      "sourceDirect": "प्रत्यक्ष",
+      "timelineProgress": "टाइमलाइन प्रगति",
+      "timelineProgressSub": "ऑपरेशन तैयारी और जाँच",
+      "completed": "पूर्ण",
+      "myAssignment": "मेरा असाइनमेंट",
+      "allocationMethod": "आवंटन विधि",
+      "rankScore": "रैंक स्कोर",
+      "assignmentNote": "असाइनमेंट नोट: {{note}}.",
+      "assignmentDefaultBody": "समझौते के अनुसार सेवा पूर्ति की पूर्ण जिम्मेदारी। इवेंट अवधि में परिचालन उत्कृष्टता और ब्रांड मानक बनाए रखें।",
+      "saving": "सेव हो रहा है...",
+      "bookedService": "बुक की गई सेवा",
+      "locked": "लॉक",
+      "unlocked": "अनलॉक",
+      "clientPaymentPolicy": "क्लाइंट भुगतान नीति",
+      "viewMilestones": "माइलस्टोन देखें",
+      "packageDetails": "पैकेज विवरण",
+      "packageName": "पैकेज नाम",
+      "packageNotLinked": "पैकेज लिंक नहीं",
+      "guestRange": "अतिथि सीमा",
+      "verifiedBannerTitle": "MarryMantra सत्यापित असाइनमेंट",
+      "functionOne": "{{count}} फ़ंक्शन",
+      "functionOther": "{{count}} फ़ंक्शन"
+    }
+  },
+  "menu": {
+    "open": "मेनू खोलें",
+    "notifications": "सूचनाएँ"
+  },
+  "onboarding": {
+    "pending": {
+      "title": "फ़ील्ड सत्यापन",
+      "pendingMessage": "आपका आवेदन फ़ील्ड सत्यापन में है। पूरा होने पर हम सूचित करेंगे।",
+      "refreshStatus": "स्थिति रिफ्रेश करें",
+      "approvedMessage": "स्वीकृत! अब आप ऐप एक्सेस कर सकते हैं।",
+      "rejectedMessage": "आवेदन अस्वीकृत। आपकी ऑनबोर्डिंग फ़ीस रिफंड कर दी गई है।"
+    },
+    "roleSelection": {
+      "title": "अपनी भूमिका चुनें",
+      "subtitle": "वह भूमिका चुनें जो आपके व्यवसाय को सबसे अच्छी तरह बताती है",
+      "loadingTypes": "पार्टनर प्रकार लोड हो रहे हैं...",
+      "loadTypesFailed": "पार्टनर प्रकार लोड नहीं हो सके। कृपया फिर कोशिश करें।"
+    },
+    "citySelection": {
+      "title": "अपना स्थान दर्ज करें",
+      "subtitle": "आगे बढ़ने के लिए आपका स्थान अनिवार्य है",
+      "detecting": "आपका शहर स्वचालित पहचान हो रहा है...",
+      "suggested": "सुझाया शहर: {{name}}, {{state}}",
+      "currentCityLabel": "वर्तमान शहर",
+      "selectPlaceholder": "अपना शहर चुनें",
+      "searchPlaceholder": "शहर या राज्य खोजें...",
+      "loadingCities": "शहर लोड हो रहे हैं...",
+      "loadCitiesFailed": "शहर लोड नहीं हो सके। कृपया फिर कोशिश करें।"
+    }
+  },
+  "earnings": {
+    "title": "कमाई और भुगतान",
+    "subtitle": "आय, बोनस और भुगतान ट्रैक करें",
+    "tabs": {
+      "dashboard": "डैशबोर्ड",
+      "commission": "कमीशन",
+      "bonus": "बोनस",
+      "services": "सेवाएँ",
+      "ranking": "रैंकिंग",
+      "payouts": "भुगतान",
+      "penalties": "जुर्माना"
+    },
+    "dashboard": {
+      "cardTitle": "मेरी कमाई डैशबोर्ड",
+      "cardSubtitle": "कुल आय, मासिक भुगतान, लंबित और निकाली राशि ट्रैक करें",
+      "totalIncome": "कुल आय",
+      "monthlyPayout": "मासिक भुगतान",
+      "pendingAmount": "लंबित राशि",
+      "withdrawn": "निकाली गई",
+      "withdrawableBalance": "निकासी योग्य बैलेंस",
+      "withdraw": "निकालें",
+      "selfBookingBonus": "स्व-बुकिंग बोनस",
+      "cityRank": "शहर रैंक",
+      "servicePoints": "सेवा अंक"
+    },
+    "commission": {
+      "title": "कमीशन विवरण ट्रैकर",
+      "subtitle": "प्रति बुकिंग कमीशन — स्व-बुक vs कंपनी-असाइन",
+      "selfBooked": "स्व-बुक",
+      "companyAssigned": "कंपनी-असाइन"
+    },
+    "bonus": {
+      "title": "स्व-बुकिंग बोनस सारांश",
+      "subtitle": "अपनी ID से बुक अतिरिक्त सेवाओं का बोनस देखें",
+      "totalLabel": "कुल स्व-बुकिंग बोनस",
+      "breakdownTitle": "बोनस विवरण",
+      "empty": "अभी कोई बोनस डेटा नहीं।"
+    },
+    "services": {
+      "title": "सेवा अंक मॉनिटर",
+      "subtitle": "आपने कितनी सेवाएँ बुक कीं और रैंकिंग पर असर"
+    },
+    "ranking": {
+      "title": "रैंकिंग और प्रदर्शन बूस्ट",
+      "subtitle": "शहर में आपकी रैंक और लीडरबोर्ड पर ऊपर जाने के टिप्स",
+      "currentRank": "वर्तमान रैंक",
+      "outOfPartners": "{{count}} पार्टनर में से",
+      "performanceTips": "प्रदर्शन टिप्स",
+      "tipsEmpty": "अभी कोई प्रदर्शन टिप नहीं।"
+    },
+    "payouts": {
+      "title": "भुगतान और निकासी प्रबंधक",
+      "subtitle": "निकासी योग्य बैलेंस, ट्रांसफ़र इतिहास और सुरक्षित भुगतान",
+      "availableBalance": "उपलब्ध बैलेंस",
+      "transferHistory": "ट्रांसफ़र इतिहास"
+    },
+    "penalties": {
+      "title": "जुर्माना ट्रैकर और ID होल्ड",
+      "subtitle": "ब्रांडिंग या देरी जुर्माने और ID ब्लॉक लॉजिक",
+      "totalPenalties": "कुल जुर्माने",
+      "activeDues": "सक्रिय बकाया",
+      "clearPenalty": "जुर्माना मिटाएँ"
+    },
+    "walletScreen": {
+      "title": "कमाई",
+      "subtitle": "कमीशन क्रेडिट और वॉलेट भुगतान तैयारी",
+      "loading": "कमाई लोड हो रही है...",
+      "loadFailed": "कमाई लोड नहीं हो सकी।",
+      "refreshFailed": "कमाई रिफ्रेश नहीं हो सकी।",
+      "totalCredited": "कुल जमा कमाई",
+      "walletBacked": "वॉलेट समर्थित",
+      "heroNote": "क्रेडिट में QR, क्रॉस-सेल, ऑनबोर्डिंग रेफ़रल और अन्य पार्टनर वॉलेट कमीशन शामिल हैं।",
+      "available": "उपलब्ध",
+      "debited": "डेबिट",
+      "creditsCount": "क्रेडिट",
+      "commissionCredits": "कमीशन क्रेडिट",
+      "recentCommission": "{{count}} हाल के कमीशन-लिंक प्रविष्टियाँ",
+      "emptyTitle": "अभी कोई कमाई जमा नहीं",
+      "emptyBody": "अग्रिम-भुगतान पार्टनर कमीशन वॉलेट में जमा होने पर यहाँ दिखेंगे।",
+      "openWalletTitle": "पूरा वॉलेट लेजर खोलें",
+      "openWalletSub": "{{count}} डेबिट प्रविष्टियाँ और पूरा लेन-देन इतिहास",
+      "downloadInvoiceTitle": "नवीनतम इनवॉइस डाउनलोड करें",
+      "downloadInvoiceSub": "टैक्स इनवॉइस, रसीदें और कमीशन विवरण",
+      "invoicesTitle": "इनवॉइस",
+      "noInvoices": "अभी कोई इनवॉइस नहीं।",
+      "downloadFailed": "डाउनलोड विफल",
+      "downloadFailedBody": "इनवॉइस नहीं खोल सके"
+    }
+  },
+  "kyc": {
+    "stepProgress": "चरण {{current}} / {{total}}",
+    "a11y": {
+      "backToDashboard": "डैशबोर्ड पर वापस",
+      "previousStep": "पिछला चरण"
+    },
+    "saveProgress": "प्रगति सहेजें",
+    "continueButton": "जारी रखें",
+    "steps": {
+      "profile_role": {
+        "title": "प्रोफ़ाइल और भूमिका",
+        "description": "नाम, कानूनी इकाई, शहर चयन"
+      },
+      "identity_liveness": {
+        "title": "पहचान + लाइवनेस",
+        "description": "सरकारी ID और सेल्फी सत्यापन"
+      },
+      "business_license": {
+        "title": "व्यवसाय/लाइसेंस",
+        "description": "व्यवसाय दस्तावेज़ और भूमिका-विशिष्ट लाइसेंस"
+      },
+      "address_proof": {
+        "title": "पता सत्यापन",
+        "description": "संचालन पते के प्रमाण दस्तावेज़"
+      },
+      "bank_verify": {
+        "title": "बैंक सत्यापन",
+        "description": "खाता विवरण और पैनी ड्रॉप सत्यापन"
+      },
+      "payment_policy": {
+        "title": "भुगतान नीति स्वीकृति",
+        "description": "भुगतान नीतियाँ चुनें और स्वीकार करें"
+      },
+      "venue_type": {
+        "title": "वेन्यू प्रकार",
+        "description": "इनडोर, आउटडोर, या दोनों"
+      },
+      "venue_capacity": {
+        "title": "वेन्यू क्षमता",
+        "description": "अतिथि क्षमता और स्थान पुष्टि"
+      },
+      "scale_match": {
+        "title": "ScaleMatch™",
+        "description": "क्षमता घोषणा और कार्य प्रमाण"
+      },
+      "agreements": {
+        "title": "समझौते और सहमति",
+        "description": "विक्रेता समझौता और गोपनीयता सहमति"
+      },
+      "decision": {
+        "title": "निर्णय और गो-लाइव",
+        "description": "अंतिम स्वीकृति और ऐप अनलॉक"
+      },
+      "b1_lite_kyc": {
+        "title": "त्वरित LITE KYC",
+        "description": "ID + सेल्फी लाइवनेस, शहर/पता, OTP सत्यापित मोबाइल/ईमेल"
+      },
+      "b2_token_booking": {
+        "title": "टोकन बुकिंग सेटअप",
+        "description": "₹5,000 टोकन प्लेटफ़ॉर्म सेटअप"
+      },
+      "b3_bank_jit": {
+        "title": "बैंक JIT (पहला कमीशन)",
+        "description": "पहला कमीशन मिलने पर बैंक जोड़ें"
+      },
+      "b4_optional_upgrade": {
+        "title": "FULL KYC में वैकल्पिक अपग्रेड",
+        "description": "पहले भुगतान के बाद FULL KYC में अपग्रेड"
+      }
+    },
+    "profileRole": {
+      "titleLine1": "अपनी",
+      "titleAccent": "पेशेवर प्रोफ़ाइल पूरी करें।",
+      "description": "सत्यापन शुरू करने के लिए, कृपया अपने कानूनी पहचान विवरण वैसे ही दर्ज करें जैसे आधिकारिक दस्तावेज़ों में हैं।",
+      "alerts": {
+        "requiredFields": "कृपया सभी आवश्यक फ़ील्ड भरें",
+        "companyNameRequired": "कानूनी इकाई कंपनी होने पर कंपनी का नाम आवश्यक है",
+        "submissionFailed": "प्रोफ़ाइल जानकारी जमा नहीं हो सकी। कृपया पुनः प्रयास करें।"
+      }
+    },
+    "lite": {
+      "selectIdDocumentTitle": "ID दस्तावेज़ चुनें",
+      "selectSelfieTitle": "सेल्फी लें",
+      "pickerChooseOption": "एक विकल्प चुनें",
+      "camera": "कैमरा",
+      "gallery": "गैलरी",
+      "permissionPhotos": "फ़ोटो लाइब्रेरी की अनुमति आवश्यक है!",
+      "alerts": {
+        "uploadFailed": "छवि अपलोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+        "selectImageFailed": "छवि चुन नहीं सके। कृपया पुनः प्रयास करें।",
+        "selectDocumentFailed": "दस्तावेज़ चुन नहीं सके। कृपया पुनः प्रयास करें।",
+        "uploadInProgress": "जमा करने से पहले अपलोड पूरा होने की प्रतीक्षा करें।",
+        "selectIdType": "कृपया ID प्रकार चुनें",
+        "enterIdNumber": "कृपया ID नंबर दर्ज करें",
+        "invalidIdTitle": "अमान्य ID नंबर",
+        "uploadIdDocument": "कृपया अपना ID दस्तावेज़ अपलोड करें",
+        "uploadSelfie": "सत्यापन के लिए सेल्फी अपलोड करें",
+        "enterAddress": "कृपया अपना पता दर्ज करें",
+        "enterEmail": "कृपया अपना ईमेल दर्ज करें",
+        "cityRequired": "शहर की जानकारी आवश्यक है",
+        "invalidEmailTitle": "अमान्य ईमेल",
+        "submissionFailedTitle": "जमा करना विफल"
+      }
+    },
+    "alerts": {
+      "documentsMissingTitle": "KYC दस्तावेज़ अनुपलब्ध",
+      "documentsMissingMessage": "जमा करने से पहले कम से कम एक KYC दस्तावेज़ अपलोड करें।",
+      "submitFailed": "KYC जमा नहीं हो सका। कृपया पुनः प्रयास करें।",
+      "uploadFailedTitle": "अपलोड विफल",
+      "requiredFieldsTitle": "आवश्यक फ़ील्ड",
+      "uploadInProgressTitle": "अपलोड जारी",
+      "permissionRequiredTitle": "अनुमति आवश्यक",
+      "submissionFailedTitle": "जमा करना विफल",
+      "invalidIdTitle": "अमान्य ID नंबर"
+    }
+  }
+}

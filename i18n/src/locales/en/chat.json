@@ -1,0 +1,23 @@
+{
+  "messages": "Messages",
+  "searchConversations": "Search conversations",
+  "all": "All",
+  "partner": "Partner",
+  "cityManager": "City Manager",
+  "client": "Client",
+  "noConversations": "No conversations yet",
+  "noMatches": "No matches",
+  "noMessagesYet": "No messages yet. Say hello!",
+  "typeMessage": "Type a message…",
+  "chatLocked": "Chat is locked.",
+  "completeToken": "Complete token payment to unlock chat.",
+  "you": "You",
+  "customer": "Customer",
+  "chat": "Chat",
+  "sendFailed": "Could not send message. Try again.",
+  "unknown": "Unknown",
+  "noMessagesPreview": "No messages yet",
+  "tryDifferentSearch": "Try a different search or filter.",
+  "advancePaymentRequired": "Complete advance payment to unlock chat.",
+  "now": "now"
+}

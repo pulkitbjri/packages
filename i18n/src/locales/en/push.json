@@ -1,0 +1,8 @@
+{
+  "proofApprovedTitle": "Proof Approved",
+  "proofApprovedBody": "Your preparation proof for {{event}} was approved.",
+  "homeVisitProposedTitle": "Home visit times proposed",
+  "homeVisitProposedBody": "Your agent proposed visit times. Please review and confirm.",
+  "bookingUpdateTitle": "Booking update",
+  "bookingUpdateBody": "There is an update on your booking."
+}

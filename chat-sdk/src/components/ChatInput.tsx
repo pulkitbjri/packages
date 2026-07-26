@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -27,8 +28,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   sending,
   theme,
   disabled = false,
-  placeholder = 'Type a message...',
+  placeholder,
 }) => {
+  const { t } = useTranslation('chat');
+  const resolvedPlaceholder = placeholder ?? t('typeMessage');
   const [text, setText] = useState('');
 
   const blocked = disabled || sending;
@@ -81,7 +84,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           style={[styles.input, { color: disabled ? muted : theme.text }]}
           value={text}
           onChangeText={setText}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           placeholderTextColor={muted}
           multiline
           maxLength={2000}

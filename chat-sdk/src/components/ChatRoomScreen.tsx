@@ -1,4 +1,5 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -17,25 +18,31 @@ import { resolveTheme } from './defaultTheme';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 
-function formatRoleCaption(role?: ChatParticipantRole): string | null {
+function formatRoleCaption(
+  role: ChatParticipantRole | undefined,
+  t: (key: string) => string,
+): string | null {
   if (!role) return null;
-  if (role === 'cm') return 'City Manager';
-  if (role === 'partner') return 'Partner';
-  if (role === 'user') return 'Client';
+  if (role === 'cm') return t('cityManager');
+  if (role === 'partner') return t('partner');
+  if (role === 'user') return t('client');
   return null;
 }
 
-function humanizeLockReason(reason: string | null | undefined): string {
+function humanizeLockReason(
+  reason: string | null | undefined,
+  t: (key: string) => string,
+): string {
   switch (reason) {
     case 'token_payment_required':
-      return 'Complete token payment to chat.';
+      return t('completeToken');
     case 'advance_payment_required':
-      return 'Complete advance payment to chat.';
+      return t('advancePaymentRequired');
     default:
       if (reason?.trim()) {
         return reason.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) + '.';
       }
-      return 'Chat is locked.';
+      return t('chatLocked');
   }
 }
 
@@ -53,6 +60,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   pickImage,
   sendError: sendErrorProp,
 }) => {
+  const { t } = useTranslation('chat');
   const theme = resolveTheme(themeOverride);
   const [localSendError, setLocalSendError] = useState<string | null>(null);
   const sendError = sendErrorProp ?? localSendError;
@@ -111,11 +119,11 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         await send(text);
       } catch {
         if (sendErrorProp == null) {
-          setLocalSendError('Message could not be sent. Try again.');
+          setLocalSendError(t('sendFailed'));
         }
       }
     },
-    [send, sendErrorProp],
+    [send, sendErrorProp, t],
   );
 
   const handleSendImage = useCallback(
@@ -127,15 +135,19 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         await sendImage(localUri);
       } catch {
         if (sendErrorProp == null) {
-          setLocalSendError('Image could not be sent. Try again.');
+          setLocalSendError(t('sendFailed'));
         }
       }
     },
-    [sendImage, sendErrorProp],
+    [sendImage, sendErrorProp, t],
   );
 
-  const roleCaption = formatRoleCaption(otherPartyRole);
-  const displayName = otherPartyName?.trim() ? otherPartyName.trim() : 'Chat';
+  const roleCaption = formatRoleCaption(otherPartyRole, t);
+  const displayName = otherPartyName?.trim() ? otherPartyName.trim() : t('chat');
+  const lockBannerText = useMemo(
+    () => humanizeLockReason(lockReason, t),
+    [lockReason, t],
+  );
   const composerDisabled = locked;
 
   const renderItem = useCallback(
@@ -196,7 +208,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
       {locked ? (
         <View style={[styles.lockBanner, { backgroundColor: theme.receivedBubble, borderBottomColor: theme.border }]}>
           <Text style={[styles.lockBannerText, { color: theme.text }]}>
-            {humanizeLockReason(lockReason)}
+            {lockBannerText}
           </Text>
         </View>
       ) : null}
@@ -212,7 +224,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         ) : messages.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-              No messages yet. Say hello!
+              {t('noMessagesYet')}
             </Text>
           </View>
         ) : (

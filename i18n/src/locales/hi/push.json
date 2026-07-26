@@ -1,0 +1,8 @@
+{
+  "proofApprovedTitle": "प्रूफ स्वीकृत",
+  "proofApprovedBody": "{{event}} के लिए आपका तैयारी प्रूफ स्वीकृत हो गया।",
+  "homeVisitProposedTitle": "होम विज़िट समय प्रस्तावित",
+  "homeVisitProposedBody": "आपके एजेंट ने विज़िट समय प्रस्तावित किए। कृपया देखकर पुष्टि करें।",
+  "bookingUpdateTitle": "बुकिंग अपडेट",
+  "bookingUpdateBody": "आपकी बुकिंग में अपडेट है।"
+}
