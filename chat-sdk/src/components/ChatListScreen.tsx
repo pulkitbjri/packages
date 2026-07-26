@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  ActivityIndicator,
+  TextInput,
 } from 'react-native';
-import type { ChatListScreenProps, Chat, ChatTheme } from '../types';
+import type {
+  ChatListScreenProps,
+  Chat,
+  ChatTheme,
+  ChatParticipantRole,
+} from '../types';
 import { resolveTheme } from './defaultTheme';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+type RoleFilter = 'all' | 'partner' | 'cm' | 'user';
 
 function formatRelativeTime(date: Date): string {
   const now = new Date();
@@ -29,10 +32,7 @@ function formatRelativeTime(date: Date): string {
   return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 }
 
-function getOtherPartyName(
-  chat: Chat,
-  currentUserId: string,
-): string {
+function getOtherPartyName(chat: Chat, currentUserId: string): string {
   const names = chat.participantNames ?? {};
   for (const [id, name] of Object.entries(names)) {
     if (id !== currentUserId) {
@@ -44,13 +44,23 @@ function getOtherPartyName(
   return 'Unknown';
 }
 
-function getOtherPartyRole(chat: Chat, currentUserId: string): string {
+function getOtherPartyRole(
+  chat: Chat,
+  currentUserId: string,
+): ChatParticipantRole | null {
   for (const [id, role] of Object.entries(chat.participantRoles ?? {})) {
-    if (id !== currentUserId) {
-      return role?.toUpperCase?.() ?? 'CHAT';
+    if (id !== currentUserId && role) {
+      return role;
     }
   }
-  return 'CHAT';
+  return null;
+}
+
+function rolePillLabel(role: ChatParticipantRole | null): string {
+  if (role === 'cm') return 'City Manager';
+  if (role === 'partner') return 'Partner';
+  if (role === 'user') return 'Client';
+  return 'Chat';
 }
 
 function getBookingContext(chat: Chat): string {
@@ -62,9 +72,28 @@ function getBookingContext(chat: Chat): string {
   return parts.join(' · ') || `Booking #${chat.bookingId}`;
 }
 
-// ---------------------------------------------------------------------------
-// Chat Row
-// ---------------------------------------------------------------------------
+function matchesRoleFilter(
+  chat: Chat,
+  filter: RoleFilter,
+  currentUserId: string,
+): boolean {
+  if (filter === 'all') return true;
+  const role = getOtherPartyRole(chat, currentUserId);
+  return role === filter;
+}
+
+function matchesSearchQuery(
+  chat: Chat,
+  query: string,
+  currentUserId: string,
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const name = getOtherPartyName(chat, currentUserId).toLowerCase();
+  const booking = getBookingContext(chat).toLowerCase();
+  const last = (chat.lastMessage ?? '').toLowerCase();
+  return name.includes(q) || booking.includes(q) || last.includes(q);
+}
 
 interface ChatRowProps {
   chat: Chat;
@@ -78,10 +107,17 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
   const otherRole = getOtherPartyRole(chat, currentUserId);
   const bookingContext = getBookingContext(chat);
   const unread = chat.unreadCount?.[currentUserId] ?? 0;
+  const badgeColor = theme.accent || theme.primary;
 
   return (
     <TouchableOpacity
-      style={[styles.row, { borderBottomColor: theme.border }]}
+      style={[
+        styles.card,
+        {
+          backgroundColor: theme.surface,
+          borderColor: theme.border,
+        },
+      ]}
       onPress={onPress}
       activeOpacity={0.65}>
       <View style={[styles.avatar, { backgroundColor: theme.primary }]}>
@@ -102,14 +138,16 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
               {otherName}
             </Text>
             <View style={[styles.rolePill, { backgroundColor: theme.receivedBubble }]}>
-              <Text style={[styles.rolePillText, { color: theme.primary }]}>{otherRole}</Text>
+              <Text style={[styles.rolePillText, { color: theme.primary }]}>
+                {rolePillLabel(otherRole)}
+              </Text>
             </View>
           </View>
           <Text style={[styles.time, { color: theme.timestamp }]}>
             {formatRelativeTime(chat.lastMessageAt)}
           </Text>
         </View>
-        <Text style={[styles.bookingContext, { color: theme.timestamp }]} numberOfLines={1}>
+        <Text style={[styles.bookingContext, { color: theme.textSecondary }]} numberOfLines={1}>
           {bookingContext}
         </Text>
         <View style={styles.rowBottom}>
@@ -122,20 +160,60 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
             numberOfLines={1}>
             {chat.lastMessage || 'No messages yet'}
           </Text>
-          {unread > 0 && (
-            <View style={[styles.badge, { backgroundColor: theme.primary }]}>
+          {unread > 0 ? (
+            <View style={[styles.badge, { backgroundColor: badgeColor }]}>
               <Text style={styles.badgeText}>{unread > 99 ? '99+' : unread}</Text>
             </View>
-          )}
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>
   );
 };
 
-// ---------------------------------------------------------------------------
-// ChatListScreen
-// ---------------------------------------------------------------------------
+const SkeletonRow: React.FC<{ theme: ChatTheme }> = ({ theme }) => (
+  <View
+    style={[
+      styles.card,
+      styles.skeletonCard,
+      { backgroundColor: theme.surface, borderColor: theme.border },
+    ]}>
+    <View style={[styles.skeletonAvatar, { backgroundColor: theme.border }]} />
+    <View style={styles.skeletonBody}>
+      <View style={[styles.skeletonLine, styles.skeletonLineShort, { backgroundColor: theme.border }]} />
+      <View style={[styles.skeletonLine, { backgroundColor: theme.border }]} />
+      <View style={[styles.skeletonLine, styles.skeletonLineMedium, { backgroundColor: theme.border }]} />
+    </View>
+  </View>
+);
+
+interface FilterChipProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+  theme: ChatTheme;
+}
+
+const FilterChip: React.FC<FilterChipProps> = ({ label, active, onPress, theme }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={[
+      styles.chip,
+      {
+        borderColor: theme.primary,
+        backgroundColor: active ? theme.primary : theme.surface,
+      },
+    ]}
+    activeOpacity={0.7}>
+    <Text
+      style={[
+        styles.chipText,
+        { color: active ? '#FFFFFF' : theme.primary },
+      ]}>
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
 
 export const ChatListScreen: React.FC<ChatListScreenProps> = ({
   currentUserId,
@@ -147,6 +225,9 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
   const theme = resolveTheme(themeOverride);
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
+
   const fetchList = loadChatsViaApi?.fetchList;
   const subscribeToEvents = loadChatsViaApi?.subscribeToEvents;
   const pollMs = loadChatsViaApi?.pollIntervalMs ?? 10_000;
@@ -161,7 +242,7 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
       const result = await fetchList();
       setChats(result.chats);
     } catch {
-      // leave prior list; clear spinner so API errors don't hang forever
+      // leave prior list
     } finally {
       setLoading(false);
     }
@@ -188,6 +269,16 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
     });
   }, [subscribeToEvents, refresh]);
 
+  const filteredChats = useMemo(
+    () =>
+      chats.filter(
+        (chat) =>
+          matchesRoleFilter(chat, roleFilter, currentUserId) &&
+          matchesSearchQuery(chat, searchQuery, currentUserId),
+      ),
+    [chats, roleFilter, searchQuery, currentUserId],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: Chat }) => {
       const otherName = getOtherPartyName(item, currentUserId);
@@ -205,50 +296,166 @@ export const ChatListScreen: React.FC<ChatListScreenProps> = ({
 
   const keyExtractor = useCallback((item: Chat) => item.chatId, []);
 
+  const emptySubtitle =
+    currentUserRole === 'user'
+      ? 'Browse partners and send a message to start chatting.'
+      : 'Clients will reach out when they need your services.';
+
+  const listEmptyAfterFilter =
+    !loading && chats.length > 0 && filteredChats.length === 0;
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+      <View
+        style={[
+          styles.header,
+          { backgroundColor: theme.surface, borderBottomColor: theme.border },
+        ]}>
         <Text style={[styles.headerTitle, { color: theme.text }]}>Messages</Text>
+        <View
+          style={[
+            styles.searchWrap,
+            { backgroundColor: theme.background, borderColor: theme.border },
+          ]}>
+          <TextInput
+            style={[styles.searchInput, { color: theme.text }]}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search conversations"
+            placeholderTextColor={theme.timestamp}
+            autoCorrect={false}
+            clearButtonMode="while-editing"
+          />
+        </View>
+        <View style={styles.chipRow}>
+          <FilterChip
+            label="All"
+            active={roleFilter === 'all'}
+            onPress={() => setRoleFilter('all')}
+            theme={theme}
+          />
+          {currentUserRole === 'user' ? (
+            <>
+              <FilterChip
+                label="Partner"
+                active={roleFilter === 'partner'}
+                onPress={() => setRoleFilter('partner')}
+                theme={theme}
+              />
+              <FilterChip
+                label="City Manager"
+                active={roleFilter === 'cm'}
+                onPress={() => setRoleFilter('cm')}
+                theme={theme}
+              />
+            </>
+          ) : (
+            <>
+              <FilterChip
+                label="Client"
+                active={roleFilter === 'user'}
+                onPress={() => setRoleFilter('user')}
+                theme={theme}
+              />
+              {currentUserRole === 'partner' ? (
+                <FilterChip
+                  label="City Manager"
+                  active={roleFilter === 'cm'}
+                  onPress={() => setRoleFilter('cm')}
+                  theme={theme}
+                />
+              ) : (
+                <FilterChip
+                  label="Partner"
+                  active={roleFilter === 'partner'}
+                  onPress={() => setRoleFilter('partner')}
+                  theme={theme}
+                />
+              )}
+            </>
+          )}
+        </View>
       </View>
 
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.primary} />
+        <View style={styles.listPad}>
+          <SkeletonRow theme={theme} />
+          <SkeletonRow theme={theme} />
+          <SkeletonRow theme={theme} />
         </View>
       ) : chats.length === 0 ? (
         <View style={styles.center}>
-          <Text style={[styles.emptyIcon]}>💬</Text>
           <Text style={[styles.emptyTitle, { color: theme.text }]}>No conversations yet</Text>
           <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-            {currentUserRole === 'user'
-              ? 'Browse partners and send a message to start chatting.'
-              : 'Clients will reach out when they need your services.'}
+            {emptySubtitle}
+          </Text>
+        </View>
+      ) : listEmptyAfterFilter ? (
+        <View style={styles.center}>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>No matches</Text>
+          <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+            Try a different search or filter.
           </Text>
         </View>
       ) : (
         <FlatList
-          data={chats}
+          data={filteredChats}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
+          contentContainerStyle={styles.listPad}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         />
       )}
     </SafeAreaView>
   );
 };
 
+const CARD_RADIUS = 12;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
+    marginBottom: 12,
+  },
+  searchWrap: {
+    borderRadius: CARD_RADIUS,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+  },
+  searchInput: {
+    fontSize: 15,
+    paddingVertical: 10,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    borderRadius: CARD_RADIUS,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  listPad: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   center: {
     flex: 1,
@@ -256,55 +463,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
   },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
+    textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
   },
-  row: {
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderRadius: CARD_RADIUS,
+    borderWidth: 1,
+    marginBottom: 10,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
     color: '#FFF',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
   },
   rowContent: {
     flex: 1,
     marginLeft: 12,
+    minWidth: 0,
   },
   rowTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 4,
+    gap: 8,
   },
   nameGroup: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
-    gap: 8,
+    flexWrap: 'wrap',
+    gap: 6,
+    minWidth: 0,
   },
   name: {
     fontSize: 16,
@@ -315,7 +524,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   rolePill: {
-    borderRadius: 999,
+    borderRadius: CARD_RADIUS,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
@@ -343,7 +552,7 @@ const styles = StyleSheet.create({
   badge: {
     minWidth: 22,
     height: 22,
-    borderRadius: 11,
+    borderRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
@@ -352,5 +561,29 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 12,
     fontWeight: '700',
+  },
+  skeletonCard: {
+    opacity: 0.7,
+  },
+  skeletonAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: CARD_RADIUS,
+  },
+  skeletonBody: {
+    flex: 1,
+    marginLeft: 12,
+    gap: 8,
+  },
+  skeletonLine: {
+    height: 10,
+    borderRadius: 4,
+    width: '90%',
+  },
+  skeletonLineShort: {
+    width: '55%',
+  },
+  skeletonLineMedium: {
+    width: '70%',
   },
 });

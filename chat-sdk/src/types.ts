@@ -115,6 +115,12 @@ export type ChatEventSubscribeFn = (
   onEvent: (event: ChatRealtimeEvent) => void,
 ) => () => void;
 
+/** Known server lock codes; other strings may still be shown humanized. */
+export type ChatLockReason =
+  | 'token_payment_required'
+  | 'advance_payment_required'
+  | (string & {});
+
 export interface ChatRoomScreenProps {
   chatId: string;
   currentUserId: string;
@@ -136,4 +142,10 @@ export interface ChatRoomScreenProps {
   };
   onBack?: () => void;
   theme?: Partial<ChatTheme>;
+  locked?: boolean;
+  lockReason?: ChatLockReason | null;
+  /** Host opens image picker; returns local file URI or null if cancelled. */
+  pickImage?: () => Promise<string | null>;
+  /** When set, shown under the composer (e.g. host-controlled send failure). */
+  sendError?: string | null;
 }

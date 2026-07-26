@@ -13,6 +13,7 @@ export type {
   ChatThreadsFetchFn,
   ChatEventSubscribeFn,
   ChatRealtimeEvent,
+  ChatLockReason,
 } from './types';
 
 export type { ChatMessagesApiNameContext } from './chatMessagesApi';
@@ -40,6 +41,7 @@ export { ChatInput } from './components/ChatInput';
 export {
   DEFAULT_CHAT_THEME,
   PARTNER_CHAT_THEME,
+  USER_FESTIVE_CHAT_THEME,
   resolveTheme,
 } from './components/defaultTheme';
 

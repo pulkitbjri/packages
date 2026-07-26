@@ -32,6 +32,23 @@ export const PARTNER_CHAT_THEME: ChatTheme = {
   timestamp: '#94A3B8',
 };
 
+/** User app — Festive Sharp (wine accents / sindoor sent bubbles). */
+export const USER_FESTIVE_CHAT_THEME: ChatTheme = {
+  primary: '#8B1A2B',
+  background: '#F9FAFB',
+  surface: '#FFFFFF',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  border: '#E5E7EB',
+  accent: '#D4564E',
+  sentBubble: '#D4564E',
+  sentBubbleText: '#FFFFFF',
+  receivedBubble: '#F3F4F6',
+  receivedBubbleText: '#1F2937',
+  inputBackground: '#FFFFFF',
+  timestamp: '#9CA3AF',
+};
+
 export function resolveTheme(partial?: Partial<ChatTheme>): ChatTheme {
   return { ...DEFAULT_CHAT_THEME, ...partial };
 }

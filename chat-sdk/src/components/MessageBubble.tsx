@@ -32,7 +32,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         styles.wrapper,
         isOwn ? styles.wrapperOwn : styles.wrapperOther,
       ]}>
-      <View style={[styles.bubble, { backgroundColor: bubbleBg }]}>
+      <View
+        style={[
+          styles.bubble,
+          { backgroundColor: bubbleBg },
+          isOwn ? styles.bubbleOwn : null,
+        ]}>
         {showSenderName && !isOwn && (
           <Text style={[styles.senderName, { color: theme.primary }]}>
             {message.senderName}
@@ -69,7 +74,9 @@ const styles = StyleSheet.create({
     maxWidth: '78%',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 18,
+    borderRadius: 12,
+  },
+  bubbleOwn: {
     borderBottomRightRadius: 4,
   },
   senderName: {

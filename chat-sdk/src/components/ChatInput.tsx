@@ -12,48 +12,87 @@ import type { ChatTheme } from '../types';
 
 interface ChatInputProps {
   onSend: (text: string) => Promise<void>;
+  onSendImage?: (localUri: string) => Promise<void>;
+  onPickImage?: () => Promise<string | null>;
   sending: boolean;
   theme: ChatTheme;
+  disabled?: boolean;
   placeholder?: string;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSend,
+  onSendImage,
+  onPickImage,
   sending,
   theme,
+  disabled = false,
   placeholder = 'Type a message...',
 }) => {
   const [text, setText] = useState('');
 
+  const blocked = disabled || sending;
+
   const handleSend = useCallback(async () => {
     const trimmed = text.trim();
-    if (!trimmed || sending) return;
+    if (!trimmed || blocked) return;
     setText('');
     Keyboard.dismiss();
     await onSend(trimmed);
-  }, [text, sending, onSend]);
+  }, [text, blocked, onSend]);
 
-  const canSend = text.trim().length > 0 && !sending;
+  const handleAttach = useCallback(async () => {
+    if (blocked || !onPickImage || !onSendImage) return;
+    const uri = await onPickImage();
+    if (uri) {
+      await onSendImage(uri);
+    }
+  }, [blocked, onPickImage, onSendImage]);
+
+  const canSend = text.trim().length > 0 && !blocked;
+  const sendColor = theme.accent || theme.primary;
+  const muted = theme.timestamp;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.surface, borderTopColor: theme.border }]}>
-      <View style={[styles.inputWrapper, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.surface, borderTopColor: theme.border },
+        disabled && styles.containerDisabled,
+      ]}>
+      {onPickImage && onSendImage ? (
+        <TouchableOpacity
+          style={[styles.attachButton, { borderColor: theme.border }]}
+          onPress={handleAttach}
+          disabled={blocked}
+          activeOpacity={0.7}>
+          <Text style={[styles.attachLabel, { color: blocked ? muted : theme.text }]}>+</Text>
+        </TouchableOpacity>
+      ) : null}
+      <View
+        style={[
+          styles.inputWrapper,
+          {
+            backgroundColor: disabled ? theme.receivedBubble : theme.inputBackground,
+            borderColor: theme.border,
+          },
+        ]}>
         <TextInput
-          style={[styles.input, { color: theme.text }]}
+          style={[styles.input, { color: disabled ? muted : theme.text }]}
           value={text}
           onChangeText={setText}
           placeholder={placeholder}
-          placeholderTextColor={theme.timestamp}
+          placeholderTextColor={muted}
           multiline
           maxLength={2000}
           returnKeyType="default"
-          editable={!sending}
+          editable={!blocked}
         />
       </View>
       <TouchableOpacity
         style={[
           styles.sendButton,
-          { backgroundColor: canSend ? theme.primary : theme.border },
+          { backgroundColor: canSend ? sendColor : theme.border },
         ]}
         onPress={handleSend}
         disabled={!canSend}
@@ -61,7 +100,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         {sending ? (
           <ActivityIndicator size="small" color="#FFF" />
         ) : (
-          <SendIcon color={canSend ? '#FFF' : theme.timestamp} />
+          <SendIcon color={canSend ? '#FFF' : muted} />
         )}
       </TouchableOpacity>
     </View>
@@ -80,11 +119,29 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderTopWidth: 1,
   },
+  containerDisabled: {
+    opacity: 0.85,
+  },
+  attachButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    marginBottom: 2,
+  },
+  attachLabel: {
+    fontSize: 22,
+    fontWeight: '400',
+    lineHeight: 24,
+  },
   inputWrapper: {
     flex: 1,
-    borderRadius: 24,
+    borderRadius: 12,
     borderWidth: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     maxHeight: 120,
     justifyContent: 'center',
@@ -98,7 +155,7 @@ const styles = StyleSheet.create({
   sendButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
