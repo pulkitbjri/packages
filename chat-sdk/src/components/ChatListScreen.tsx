@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
+  Image,
 } from 'react-native';
 import type {
   ChatListScreenProps,
@@ -54,6 +55,13 @@ function getOtherPartyRole(
     }
   }
   return null;
+}
+
+function getOtherPartyAvatar(chat: Chat, currentUserId: string): string | null {
+  const otherUserId = chat.participantIds.find((id) => id !== currentUserId);
+  if (!otherUserId) return null;
+  const url = chat.participantAvatarUrls?.[otherUserId];
+  return url?.trim() ? url.trim() : null;
 }
 
 function rolePillLabel(role: ChatParticipantRole | null): string {
@@ -108,6 +116,14 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
   const bookingContext = getBookingContext(chat);
   const unread = chat.unreadCount?.[currentUserId] ?? 0;
   const badgeColor = theme.accent || theme.primary;
+  const avatarUrl = getOtherPartyAvatar(chat, currentUserId);
+  const [imgFailed, setImgFailed] = useState(false);
+
+  useEffect(() => {
+    setImgFailed(false);
+  }, [avatarUrl]);
+
+  const showAvatarImage = Boolean(avatarUrl && !imgFailed);
 
   return (
     <TouchableOpacity
@@ -120,11 +136,19 @@ const ChatRow: React.FC<ChatRowProps> = ({ chat, currentUserId, onPress, theme }
       ]}
       onPress={onPress}
       activeOpacity={0.65}>
-      <View style={[styles.avatar, { backgroundColor: theme.primary }]}>
-        <Text style={styles.avatarText}>
-          {(otherName || '?').charAt(0).toUpperCase()}
-        </Text>
-      </View>
+      {showAvatarImage ? (
+        <Image
+          source={{ uri: avatarUrl! }}
+          style={[styles.avatar, styles.avatarImage]}
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <View style={[styles.avatar, { backgroundColor: theme.primary }]}>
+          <Text style={styles.avatarText}>
+            {(otherName || '?').charAt(0).toUpperCase()}
+          </Text>
+        </View>
+      )}
       <View style={styles.rowContent}>
         <View style={styles.rowTop}>
           <View style={styles.nameGroup}>
@@ -489,6 +513,9 @@ const styles = StyleSheet.create({
     borderRadius: CARD_RADIUS,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarImage: {
+    backgroundColor: '#E5E7EB',
   },
   avatarText: {
     color: '#FFF',

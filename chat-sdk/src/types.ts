@@ -26,6 +26,8 @@ export interface Chat {
   unreadCount: Record<string, number>;
   createdAt: Date;
   bookingMeta: ChatBookingMeta;
+  participantAvatarUrls?: Record<string, string>;
+  participantPartnerIds?: Record<string, number>;
 }
 
 export interface Message {
@@ -148,4 +150,6 @@ export interface ChatRoomScreenProps {
   pickImage?: () => Promise<string | null>;
   /** When set, shown under the composer (e.g. host-controlled send failure). */
   sendError?: string | null;
+  otherPartyAvatarUrl?: string | null;
+  onOtherPartyPress?: () => void;
 }

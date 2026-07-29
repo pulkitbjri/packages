@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import type { ChatParticipantRole, ChatRoomScreenProps, Message } from '../types';
 import { useChatMessagesApi } from '../hooks/useChatMessagesApi';
@@ -52,10 +53,17 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   lockReason,
   pickImage,
   sendError: sendErrorProp,
+  otherPartyAvatarUrl,
+  onOtherPartyPress,
 }) => {
   const theme = resolveTheme(themeOverride);
   const [localSendError, setLocalSendError] = useState<string | null>(null);
+  const [headerImgFailed, setHeaderImgFailed] = useState(false);
   const sendError = sendErrorProp ?? localSendError;
+
+  useEffect(() => {
+    setHeaderImgFailed(false);
+  }, [otherPartyAvatarUrl]);
 
   const useApiList = Boolean(loadMessagesViaApi?.fetchPage);
 
@@ -137,6 +145,42 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   const roleCaption = formatRoleCaption(otherPartyRole);
   const displayName = otherPartyName?.trim() ? otherPartyName.trim() : 'Chat';
   const composerDisabled = locked;
+  const avatarUrl = otherPartyAvatarUrl?.trim() ? otherPartyAvatarUrl.trim() : null;
+  const showHeaderAvatarImage = Boolean(avatarUrl && !headerImgFailed);
+
+  const headerTitleBlock = (
+    <View style={styles.headerTextBlock}>
+      <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>
+        {displayName}
+      </Text>
+      {roleCaption ? (
+        <Text style={[styles.headerRole, { color: theme.primary }]} numberOfLines={1}>
+          {roleCaption}
+        </Text>
+      ) : null}
+      {bookingLabel?.trim() ? (
+        <Text
+          style={[styles.headerBooking, { color: theme.textSecondary }]}
+          numberOfLines={1}>
+          {bookingLabel.trim()}
+        </Text>
+      ) : null}
+    </View>
+  );
+
+  const headerAvatar = showHeaderAvatarImage ? (
+    <Image
+      source={{ uri: avatarUrl! }}
+      style={[styles.headerAvatar, styles.headerAvatarImage]}
+      onError={() => setHeaderImgFailed(true)}
+    />
+  ) : (
+    <View style={[styles.headerAvatar, { backgroundColor: theme.primary }]}>
+      <Text style={styles.headerAvatarText}>
+        {(displayName || '?').charAt(0).toUpperCase()}
+      </Text>
+    </View>
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: Message }) => (
@@ -173,23 +217,20 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Text style={[styles.backArrow, { color: theme.text }]}>{'‹'}</Text>
         </TouchableOpacity>
-        <View style={styles.headerTextBlock}>
-          <Text style={[styles.headerTitle, { color: theme.text }]} numberOfLines={1}>
-            {displayName}
-          </Text>
-          {roleCaption ? (
-            <Text style={[styles.headerRole, { color: theme.primary }]} numberOfLines={1}>
-              {roleCaption}
-            </Text>
-          ) : null}
-          {bookingLabel?.trim() ? (
-            <Text
-              style={[styles.headerBooking, { color: theme.textSecondary }]}
-              numberOfLines={1}>
-              {bookingLabel.trim()}
-            </Text>
-          ) : null}
-        </View>
+        {onOtherPartyPress ? (
+          <TouchableOpacity
+            style={styles.headerIdentity}
+            onPress={onOtherPartyPress}
+            activeOpacity={0.7}>
+            {headerAvatar}
+            {headerTitleBlock}
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.headerIdentity}>
+            {headerAvatar}
+            {headerTitleBlock}
+          </View>
+        )}
         <View style={styles.headerSpacer} />
       </View>
 
@@ -248,6 +289,8 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   );
 };
 
+const HEADER_RADIUS = 12;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -269,6 +312,28 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '300',
     lineHeight: 34,
+  },
+  headerIdentity: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    minWidth: 0,
+    gap: 10,
+  },
+  headerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: HEADER_RADIUS,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerAvatarImage: {
+    backgroundColor: '#E5E7EB',
+  },
+  headerAvatarText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
   headerTextBlock: {
     flex: 1,

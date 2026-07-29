@@ -122,6 +122,19 @@ export function mapApiRowToChat(row: unknown): Chat {
   const unreadCount = Object.fromEntries(
     Object.entries(unreadCountRaw).map(([key, value]) => [key, pickNumber({ value }, ['value'])]),
   );
+  const participantAvatarUrlsRaw = pickRecord(o, 'participantAvatarUrls');
+  const participantAvatarUrls = Object.fromEntries(
+    Object.entries(participantAvatarUrlsRaw)
+      .map(([key, value]) => [key, String(value ?? '').trim()])
+      .filter(([, value]) => value.length > 0),
+  );
+  const participantPartnerIdsRaw = pickRecord(o, 'participantPartnerIds');
+  const participantPartnerIds = Object.fromEntries(
+    Object.entries(participantPartnerIdsRaw).map(([key, value]) => [
+      key,
+      pickNumber({ value }, ['value']),
+    ]),
+  );
   return {
     chatId: pickString(o, ['chatId', 'id']) ?? '',
     bookingId: pickNumber(o, ['bookingId']),
@@ -134,6 +147,8 @@ export function mapApiRowToChat(row: unknown): Chat {
     unreadCount,
     createdAt: parseCreatedAt(o.createdAt),
     bookingMeta: pickRecord(o, 'bookingMeta'),
+    ...(Object.keys(participantAvatarUrls).length > 0 ? { participantAvatarUrls } : {}),
+    ...(Object.keys(participantPartnerIds).length > 0 ? { participantPartnerIds } : {}),
   };
 }
 
