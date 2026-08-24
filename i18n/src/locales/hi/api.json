@@ -1,0 +1,13 @@
+{
+  "USER_NOT_FOUND": "उपयोगकर्ता नहीं मिला",
+  "VALIDATION_FAILED": "सत्यापन विफल",
+  "INVALID_STATE": "वर्तमान स्थिति में यह कार्रवाई संभव नहीं",
+  "CONFLICT": "टकराव",
+  "FORBIDDEN": "अनुमति नहीं",
+  "UNAUTHORIZED": "अनधिकृत",
+  "INTERNAL_ERROR": "कुछ गलत हो गया",
+  "PROFILE_UPDATED": "प्रोफ़ाइल अपडेट हो गई",
+  "PREFERRED_LANGUAGE_UPDATED": "भाषा प्राथमिकता अपडेट हो गई",
+  "INVALID_LANGUAGE": "भाषा en या hi होनी चाहिए",
+  "INVALID_OTP": "गलत OTP"
+}

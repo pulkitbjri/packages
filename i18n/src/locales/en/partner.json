@@ -1,0 +1,370 @@
+{
+  "hub": {
+    "title": "Partner Hub"
+  },
+  "tabs": {
+    "home": "Home",
+    "bookings": "Bookings",
+    "earnings": "Earnings",
+    "profile": "Profile",
+    "business": "Business",
+    "plans": "Plans",
+    "chat": "Chat"
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "App language",
+    "languageHint": "Choose English or Hindi for the app",
+    "publicProfile": "Public profile",
+    "logout": "Log out"
+  },
+  "auth": {
+    "loginTitle": "Partner login",
+    "enterMobile": "Enter mobile number",
+    "sendOtp": "Send OTP",
+    "verifyOtp": "Verify OTP",
+    "appName": "MarryMantra Partner",
+    "welcomeSubtitle": "Welcome! Let's get you started",
+    "partnerLogin": "Partner Login",
+    "partnerLoginSubtitle": "Self-onboarding and partner access",
+    "cityManagerLogin": "City Manager Login",
+    "cityManagerLoginSubtitle": "Verify partners and approve/refund",
+    "termsFooter": "By continuing, you agree to our",
+    "terms": "Terms & Conditions",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "enterMobileTitle": "Enter your mobile\nnumber",
+    "enterMobilePlaceholder": "Enter your mobile number",
+    "otpInfo": "We will send a 4-digit code to this number",
+    "getOtp": "Get OTP",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "enterCodeTitle": "Enter verification\ncode",
+    "otpSentTo": "We sent a code to +91 {{phone}}",
+    "enterOtpPlaceholder": "Enter 6-digit code",
+    "verify": "Verify",
+    "invalidPhoneTitle": "Invalid Phone Number",
+    "invalidPhoneMessage": "Please enter a valid 10-digit Indian mobile number",
+    "invalidOtpTitle": "Invalid OTP",
+    "invalidOtpMessage": "Please enter a valid 6-digit OTP",
+    "failedSendOtp": "Failed to send OTP",
+    "invalidOtpLogin": "Invalid OTP",
+    "unsupportedGoogleTitle": "Unsupported Login",
+    "unsupportedGoogleMessage": "Google login is available for partner accounts only.",
+    "googleNotConfiguredTitle": "Google Login Not Configured",
+    "googleNotConfiguredMessage": "Add GOOGLE_WEB_CLIENT_ID to the partner app environment.",
+    "googleLoginFailed": "Google login failed"
+  },
+  "booking": {
+    "title": "Bookings",
+    "details": "Booking details",
+    "empty": "No bookings yet",
+    "accept": "Accept",
+    "reject": "Reject",
+    "overview": "Overview"
+  },
+  "bookingList": {
+    "title": "My Assignments",
+    "totalOne": "{{count}} total assignment",
+    "totalOther": "{{count}} total assignments",
+    "leadGallery": "Lead gallery",
+    "activeLeadsOne": "{{count}} active lead",
+    "activeLeadsOther": "{{count}} active leads",
+    "active": "active",
+    "filterAll": "All",
+    "filterPending": "Pending",
+    "filterAccepted": "Accepted",
+    "filterClosed": "Closed",
+    "filterLocked": "Locked",
+    "filterUnlocked": "Unlocked",
+    "emptyTitle": "No assignments yet",
+    "emptyDefault": "New opportunities will appear here once they match your partner role.",
+    "emptyFiltered": "No {{parts}} assignments right now.",
+    "goBack": "Go back",
+    "refresh": "Refresh assignments",
+    "a11yShowAll": "Show all assignments",
+    "a11yShowStatus": "Show {{status}} assignments",
+    "a11yShowAllLocks": "Show all lock statuses",
+    "a11yShowLocked": "Show locked assignments",
+    "a11yShowUnlocked": "Show unlocked assignments"
+  },
+  "bookingDetail": {
+    "title": "Assignment\nDetails",
+    "loading": "Loading assignment details...",
+    "notFound": "Booking not found",
+    "headerUser": "USER",
+    "headerCm": "CM",
+    "tabs": {
+      "overview": "Overview",
+      "timeline": "Timeline",
+      "proofs": "Proofs",
+      "contact": "Contact"
+    },
+    "overview": {
+      "premiumAssignment": "Premium Assignment",
+      "tokenPaid": "TOKEN PAID",
+      "schedulePending": "Schedule pending",
+      "budget": "Budget",
+      "status": "Status",
+      "source": "Source",
+      "sourceDraft": "Draft",
+      "sourceDirect": "Direct",
+      "timelineProgress": "Timeline Progress",
+      "timelineProgressSub": "Operations readiness and checks",
+      "completed": "completed",
+      "myAssignment": "My Assignment",
+      "allocationMethod": "Allocation Method",
+      "rankScore": "Rank Score",
+      "assignmentNote": "Assignment note: {{note}}.",
+      "assignmentDefaultBody": "Full responsibility for service fulfillment as per agreement. Operational excellence and brand standards must be maintained throughout the event duration.",
+      "saving": "Saving...",
+      "bookedService": "Booked Service",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "clientPaymentPolicy": "Client Payment Policy",
+      "viewMilestones": "View milestones",
+      "packageDetails": "Package Details",
+      "packageName": "Package Name",
+      "packageNotLinked": "Package not linked",
+      "guestRange": "Guest Range",
+      "verifiedBannerTitle": "MarryMantra verified assignment",
+      "functionOne": "{{count}} function",
+      "functionOther": "{{count}} functions"
+    }
+  },
+  "menu": {
+    "open": "Open menu",
+    "notifications": "Notifications"
+  },
+  "onboarding": {
+    "pending": {
+      "title": "Field Verification",
+      "pendingMessage": "Your application is under field verification. We will notify you once it is completed.",
+      "refreshStatus": "Refresh Status",
+      "approvedMessage": "Approved! You can now access the app.",
+      "rejectedMessage": "Application rejected. Your onboarding fee has been refunded."
+    },
+    "roleSelection": {
+      "title": "Select Your Role",
+      "subtitle": "Choose the role that best describes your business",
+      "loadingTypes": "Loading partner types...",
+      "loadTypesFailed": "Failed to load partner types. Please try again."
+    },
+    "citySelection": {
+      "title": "Enter Your Location",
+      "subtitle": "Your location is mandatory to proceed further",
+      "detecting": "Detecting your city automatically...",
+      "suggested": "Suggested city: {{name}}, {{state}}",
+      "currentCityLabel": "CURRENT CITY",
+      "selectPlaceholder": "Select your city",
+      "searchPlaceholder": "Search city or state...",
+      "loadingCities": "Loading cities...",
+      "loadCitiesFailed": "Failed to load cities. Please try again."
+    }
+  },
+  "earnings": {
+    "title": "Earnings & Payouts",
+    "subtitle": "Track income, bonuses, and payouts",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "commission": "Commission",
+      "bonus": "Bonus",
+      "services": "Services",
+      "ranking": "Ranking",
+      "payouts": "Payouts",
+      "penalties": "Penalties"
+    },
+    "dashboard": {
+      "cardTitle": "My Earnings Dashboard",
+      "cardSubtitle": "Track total income, monthly payouts, pending and withdrawn amounts",
+      "totalIncome": "Total Income",
+      "monthlyPayout": "Monthly Payout",
+      "pendingAmount": "Pending Amount",
+      "withdrawn": "Withdrawn",
+      "withdrawableBalance": "Withdrawable Balance",
+      "withdraw": "Withdraw",
+      "selfBookingBonus": "Self-Booking Bonus",
+      "cityRank": "City Rank",
+      "servicePoints": "Service Points"
+    },
+    "commission": {
+      "title": "Commission Breakdown Tracker",
+      "subtitle": "View commission logic per booking — self-booked vs company-assigned",
+      "selfBooked": "Self-Booked",
+      "companyAssigned": "Company-Assigned"
+    },
+    "bonus": {
+      "title": "Self-Booking Bonus Summary",
+      "subtitle": "Monitor bonus earnings for extra services booked through your ID",
+      "totalLabel": "Total Self-Booking Bonus",
+      "breakdownTitle": "Bonus Breakdown",
+      "empty": "No bonus data available yet."
+    },
+    "services": {
+      "title": "Service Point Monitor",
+      "subtitle": "Check how many services you helped book and how it boosts your ranking"
+    },
+    "ranking": {
+      "title": "Ranking & Performance Booster",
+      "subtitle": "Understand your city-wise position and tips to climb the leaderboard",
+      "currentRank": "Current Rank",
+      "outOfPartners": "Out of {{count}} partners",
+      "performanceTips": "Performance Tips",
+      "tipsEmpty": "No performance tips available yet."
+    },
+    "payouts": {
+      "title": "Payout & Withdrawal Manager",
+      "subtitle": "See withdrawable balance, transfer history, and initiate payouts securely",
+      "availableBalance": "Available Balance",
+      "transferHistory": "Transfer History"
+    },
+    "penalties": {
+      "title": "Penalty Tracker & ID Hold Status",
+      "subtitle": "List of branding or delay penalties with auto ID block logic",
+      "totalPenalties": "Total Penalties",
+      "activeDues": "Active Dues",
+      "clearPenalty": "Clear Penalty"
+    },
+    "walletScreen": {
+      "title": "Earnings",
+      "subtitle": "Commission credits and wallet payout readiness",
+      "loading": "Loading earnings...",
+      "loadFailed": "Unable to load earnings.",
+      "refreshFailed": "Unable to refresh earnings.",
+      "totalCredited": "Total Earnings Credited",
+      "walletBacked": "Wallet backed",
+      "heroNote": "Credits include QR, cross-sale, onboarding referral, and other partner wallet commission entries.",
+      "available": "Available",
+      "debited": "Debited",
+      "creditsCount": "Credits",
+      "commissionCredits": "Commission Credits",
+      "recentCommission": "{{count}} recent commission-linked entries",
+      "emptyTitle": "No earnings credited yet",
+      "emptyBody": "Advance-paid partner commissions will appear here once credited to your wallet.",
+      "openWalletTitle": "Open full wallet ledger",
+      "openWalletSub": "{{count}} debit entries and full transaction history",
+      "downloadInvoiceTitle": "Download latest invoice",
+      "downloadInvoiceSub": "Tax invoices, receipts, and commission statements",
+      "invoicesTitle": "Invoices",
+      "noInvoices": "No invoices available yet.",
+      "downloadFailed": "Download failed",
+      "downloadFailedBody": "Could not open invoice"
+    }
+  },
+  "kyc": {
+    "stepProgress": "Step {{current}} of {{total}}",
+    "a11y": {
+      "backToDashboard": "Back to dashboard",
+      "previousStep": "Previous step"
+    },
+    "saveProgress": "SAVE PROGRESS",
+    "continueButton": "CONTINUE",
+    "steps": {
+      "profile_role": {
+        "title": "Profile & Role",
+        "description": "Name, legal entity, city selection"
+      },
+      "identity_liveness": {
+        "title": "Identity + Liveness",
+        "description": "Government ID and selfie verification"
+      },
+      "business_license": {
+        "title": "Business/License",
+        "description": "Business documents and role-specific licenses"
+      },
+      "address_proof": {
+        "title": "Address Verification",
+        "description": "Operating address proof documents"
+      },
+      "bank_verify": {
+        "title": "Bank Verification",
+        "description": "Account details and penny drop verification"
+      },
+      "payment_policy": {
+        "title": "Payment Policy Accept",
+        "description": "Select and accept payment policies"
+      },
+      "venue_type": {
+        "title": "Venue Type",
+        "description": "Indoor, outdoor, or both event spaces"
+      },
+      "venue_capacity": {
+        "title": "Venue Capacity",
+        "description": "Guest capacity and space confirmation"
+      },
+      "scale_match": {
+        "title": "ScaleMatch™",
+        "description": "Capacity declaration and work proofs"
+      },
+      "agreements": {
+        "title": "Agreements & Consent",
+        "description": "Vendor agreement and privacy consent"
+      },
+      "decision": {
+        "title": "Decision & Go-Live",
+        "description": "Final approval and app unlock"
+      },
+      "b1_lite_kyc": {
+        "title": "Quick LITE KYC",
+        "description": "ID + selfie liveness, city/address text, OTP verified mobile/email"
+      },
+      "b2_token_booking": {
+        "title": "Token Booking Setup",
+        "description": "₹5,000 token platform setup"
+      },
+      "b3_bank_jit": {
+        "title": "Bank JIT (First Commission)",
+        "description": "Add bank when first commission earned"
+      },
+      "b4_optional_upgrade": {
+        "title": "Optional Upgrade to FULL",
+        "description": "Upgrade to FULL KYC after first payout"
+      }
+    },
+    "profileRole": {
+      "titleLine1": "Complete your",
+      "titleAccent": "professional profile.",
+      "description": "To begin your verification, please provide your legal identification details as they appear on official documents.",
+      "alerts": {
+        "requiredFields": "Please fill in all required fields",
+        "companyNameRequired": "Company name is required when legal entity type is Company",
+        "submissionFailed": "Failed to submit profile information. Please try again."
+      }
+    },
+    "lite": {
+      "selectIdDocumentTitle": "Select ID Document",
+      "selectSelfieTitle": "Capture Selfie",
+      "pickerChooseOption": "Choose an option",
+      "camera": "Camera",
+      "gallery": "Gallery",
+      "permissionPhotos": "Permission to access camera roll is required!",
+      "alerts": {
+        "uploadFailed": "Failed to upload image. Please try again.",
+        "selectImageFailed": "Failed to select image. Please try again.",
+        "selectDocumentFailed": "Failed to select document. Please try again.",
+        "uploadInProgress": "Please wait for uploads to finish before submitting.",
+        "selectIdType": "Please select ID type",
+        "enterIdNumber": "Please enter ID number",
+        "invalidIdTitle": "Invalid ID Number",
+        "uploadIdDocument": "Please upload your ID document",
+        "uploadSelfie": "Please upload your selfie for verification",
+        "enterAddress": "Please enter your address",
+        "enterEmail": "Please enter your email",
+        "cityRequired": "City information is required",
+        "invalidEmailTitle": "Invalid Email",
+        "submissionFailedTitle": "Submission Failed"
+      }
+    },
+    "alerts": {
+      "documentsMissingTitle": "KYC Documents Missing",
+      "documentsMissingMessage": "Please upload at least one KYC document before submitting.",
+      "submitFailed": "Unable to submit KYC. Please try again.",
+      "uploadFailedTitle": "Upload Failed",
+      "requiredFieldsTitle": "Required Fields",
+      "uploadInProgressTitle": "Upload In Progress",
+      "permissionRequiredTitle": "Permission Required",
+      "submissionFailedTitle": "Submission Failed",
+      "invalidIdTitle": "Invalid ID Number"
+    }
+  }
+}

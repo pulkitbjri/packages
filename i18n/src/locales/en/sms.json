@@ -1,0 +1,5 @@
+{
+  "otp": "Your OTP is {{otp}}",
+  "otpHi": "आपका OTP है {{otp}}",
+  "bookingInvite": "You have a MarryMantra booking invitation. Open the app to view details."
+}

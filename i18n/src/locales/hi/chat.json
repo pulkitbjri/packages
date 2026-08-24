@@ -1,0 +1,23 @@
+{
+  "messages": "संदेश",
+  "searchConversations": "बातचीत खोजें",
+  "all": "सभी",
+  "partner": "पार्टनर",
+  "cityManager": "सिटी मैनेजर",
+  "client": "क्लाइंट",
+  "noConversations": "अभी कोई बातचीत नहीं",
+  "noMatches": "कोई मैच नहीं",
+  "noMessagesYet": "अभी कोई संदेश नहीं। हैलो कहें!",
+  "typeMessage": "संदेश लिखें…",
+  "chatLocked": "चैट लॉक है।",
+  "completeToken": "चैट अनलॉक करने के लिए टोकन भुगतान पूरा करें।",
+  "you": "आप",
+  "customer": "ग्राहक",
+  "chat": "चैट",
+  "sendFailed": "संदेश नहीं भेज सके। फिर कोशिश करें।",
+  "unknown": "अज्ञात",
+  "noMessagesPreview": "अभी कोई संदेश नहीं",
+  "tryDifferentSearch": "कोई और खोज या फ़िल्टर आज़माएँ।",
+  "advancePaymentRequired": "चैट अनलॉक करने के लिए एडवांस भुगतान पूरा करें।",
+  "now": "अभी"
+}

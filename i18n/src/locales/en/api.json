@@ -1,0 +1,13 @@
+{
+  "USER_NOT_FOUND": "User not found",
+  "VALIDATION_FAILED": "Validation failed",
+  "INVALID_STATE": "Operation not allowed in current state",
+  "CONFLICT": "Conflict",
+  "FORBIDDEN": "Forbidden",
+  "UNAUTHORIZED": "Unauthorized",
+  "INTERNAL_ERROR": "Something went wrong",
+  "PROFILE_UPDATED": "Profile updated successfully",
+  "PREFERRED_LANGUAGE_UPDATED": "Language preference updated",
+  "INVALID_LANGUAGE": "Language must be en or hi",
+  "INVALID_OTP": "Invalid OTP"
+}
