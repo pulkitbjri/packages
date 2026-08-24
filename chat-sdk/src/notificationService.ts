@@ -39,26 +39,58 @@ export async function requestNotificationPermission(): Promise<boolean> {
   );
 }
 
+const TRANSIENT_FCM_MARKERS = [
+  'SERVICE_NOT_AVAILABLE',
+  'AUTHENTICATION_FAILED',
+  'FIS_AUTH_ERROR',
+  'MISSING_INSTANCEID_SERVICE',
+  'TOO_MANY_REGISTRATIONS',
+];
+
+function isTransientFcmFailure(message: string): boolean {
+  const upper = message.toUpperCase();
+  return TRANSIENT_FCM_MARKERS.some((marker) => upper.includes(marker));
+}
+
+async function fetchFcmToken(): Promise<string> {
+  if (!messaging().isDeviceRegisteredForRemoteMessages) {
+    await messaging().registerDeviceForRemoteMessages();
+  }
+  return messaging().getToken();
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Returns the current FCM device token.
  * The consuming app should POST this to the backend after login.
  */
 export async function getFCMToken(): Promise<string | null> {
-  try {
-    if (!messaging().isDeviceRegisteredForRemoteMessages) {
-      await messaging().registerDeviceForRemoteMessages();
+  // ponytail: 3 tries covers cold Play Services on emulators; give up after that.
+  const retryDelaysMs = [0, 1500, 3000];
+  let lastError: unknown;
+
+  for (const waitMs of retryDelaysMs) {
+    if (waitMs > 0) {
+      await delay(waitMs);
     }
-    return await messaging().getToken();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    // Emulators / cold Play Services often return SERVICE_NOT_AVAILABLE — not an app bug.
-    if (message.includes('SERVICE_NOT_AVAILABLE')) {
-      console.warn('[chat-sdk] getFCMToken unavailable:', message);
-    } else {
-      console.error('[chat-sdk] getFCMToken error:', error);
+    try {
+      return await fetchFcmToken();
+    } catch (error) {
+      lastError = error;
+      const message = error instanceof Error ? error.message : String(error);
+      if (!isTransientFcmFailure(message)) {
+        console.error('[chat-sdk] getFCMToken error:', error);
+        return null;
+      }
     }
-    return null;
   }
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  console.warn('[chat-sdk] getFCMToken unavailable:', message);
+  return null;
 }
 
 /**

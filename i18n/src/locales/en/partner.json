@@ -1,6 +1,98 @@
 {
   "hub": {
-    "title": "Partner Hub"
+    "title": "Partner Hub",
+    "quickActions": "Quick Actions",
+    "openMenu": "Open menu",
+    "notifications": "Notifications",
+    "groups": {
+      "booking": "Booking",
+      "catalog": "Catalog",
+      "money": "Money",
+      "growth": "Growth",
+      "programs": "Programs"
+    },
+    "tiles": {
+      "book-for-client": "Book for Client",
+      "assignments": "Assignments",
+      "token-booking": "Token Bookings",
+      "booking-tracking": "Booking Tracking",
+      "packages": "Service Packages",
+      "services": "My Services",
+      "menu-management": "My Menu",
+      "venue-showcase": "Venue Showcase",
+      "inventory": "Inventory",
+      "earnings": "Earnings",
+      "partner-wallet": "Partner Wallet",
+      "accepted-payment-policies": "Payment Policies",
+      "qr-code": "QR Code",
+      "qr-analytics": "QR Analytics",
+      "ranking": "Ranking",
+      "onboarded-partners": "Onboarded Partners",
+      "home-visit": "Home Visit",
+      "franchise": "Franchise",
+      "new-bookings": "New Bookings"
+    },
+    "hero": {
+      "greetingMorning": "Good morning,",
+      "greetingAfternoon": "Good afternoon,",
+      "greetingEvening": "Good evening,",
+      "thisMonth": "THIS MONTH",
+      "balance": " balance",
+      "active": "Active",
+      "bookForClient": "Book for Client",
+      "earningsA11y": "This month's earnings"
+    },
+    "kpi": {
+      "newBookings": "New Bookings",
+      "pendingTasks": "Pending Tasks",
+      "walletBal": "Wallet Bal."
+    },
+    "todayWork": {
+      "title": "Today's work",
+      "viewAll": "View all ›",
+      "seeAllA11y": "See all assignments",
+      "emptyTitle": "All caught up!",
+      "emptySubtitle": "No active assignments right now.",
+      "today": "Today",
+      "assignmentA11y": "Assignment for {{name}}",
+      "status": {
+        "ASSIGNED": "New",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "UNASSIGNED": "Pending"
+      }
+    },
+    "growth": {
+      "title": "Growth Snapshot",
+      "viewAnalytics": "View analytics ›",
+      "viewAnalyticsA11y": "View analytics",
+      "rank": "Rank",
+      "qrScans": "QR Scans",
+      "rating": "Rating",
+      "trend": "Visibility improving this week"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "packages": "Service Packages",
+      "services": "My Packages",
+      "menu-management": "My Menu",
+      "venue-showcase": "Venue Showcase",
+      "inventory": "Inventory",
+      "new-bookings": "New Bookings",
+      "assignments": "Assignments",
+      "ranking": "Ranking & Performance",
+      "earnings": "Earnings",
+      "partner-wallet": "Partner Wallet",
+      "onboarded-partners": "Onboarded Partners",
+      "qr-code": "QR Code",
+      "qr-analytics": "QR Analytics",
+      "token-booking": "Token Bookings",
+      "booking-tracking": "Booking Tracking",
+      "home-visit": "Home Visit Agent",
+      "franchise": "Franchise Program",
+      "profile": "Profile",
+      "logout": "Logout"
+    }
   },
   "tabs": {
     "home": "Home",

@@ -1,6 +1,98 @@
 {
   "hub": {
-    "title": "पार्टनर हब"
+    "title": "पार्टनर हब",
+    "quickActions": "त्वरित क्रियाएँ",
+    "openMenu": "मेनू खोलें",
+    "notifications": "सूचनाएँ",
+    "groups": {
+      "booking": "बुकिंग",
+      "catalog": "कैटलॉग",
+      "money": "पैसा",
+      "growth": "ग्रोथ",
+      "programs": "प्रोग्राम"
+    },
+    "tiles": {
+      "book-for-client": "क्लाइंट के लिए बुक",
+      "assignments": "असाइनमेंट",
+      "token-booking": "टोकन बुकिंग",
+      "booking-tracking": "बुकिंग ट्रैकिंग",
+      "packages": "सेवा पैकेज",
+      "services": "मेरी सेवाएँ",
+      "menu-management": "मेरा मेनू",
+      "venue-showcase": "वेन्यू शोकेस",
+      "inventory": "इन्वेंटरी",
+      "earnings": "कमाई",
+      "partner-wallet": "पार्टनर वॉलेट",
+      "accepted-payment-policies": "भुगतान नीतियाँ",
+      "qr-code": "QR कोड",
+      "qr-analytics": "QR एनालिटिक्स",
+      "ranking": "रैंकिंग",
+      "onboarded-partners": "ऑनबोर्डेड पार्टनर",
+      "home-visit": "होम विज़िट",
+      "franchise": "फ्रैंचाइज़",
+      "new-bookings": "नई बुकिंग"
+    },
+    "hero": {
+      "greetingMorning": "सुप्रभात,",
+      "greetingAfternoon": "नमस्कार,",
+      "greetingEvening": "शुभ संध्या,",
+      "thisMonth": "इस महीने",
+      "balance": " बैलेंस",
+      "active": "सक्रिय",
+      "bookForClient": "क्लाइंट के लिए बुक",
+      "earningsA11y": "इस महीने की कमाई"
+    },
+    "kpi": {
+      "newBookings": "नई बुकिंग",
+      "pendingTasks": "लंबित काम",
+      "walletBal": "वॉलेट बैल."
+    },
+    "todayWork": {
+      "title": "आज का काम",
+      "viewAll": "सभी देखें ›",
+      "seeAllA11y": "सभी असाइनमेंट देखें",
+      "emptyTitle": "सब निपट गया!",
+      "emptySubtitle": "अभी कोई सक्रिय असाइनमेंट नहीं।",
+      "today": "आज",
+      "assignmentA11y": "{{name}} का असाइनमेंट",
+      "status": {
+        "ASSIGNED": "नया",
+        "ACCEPTED": "स्वीकृत",
+        "REJECTED": "अस्वीकृत",
+        "UNASSIGNED": "लंबित"
+      }
+    },
+    "growth": {
+      "title": "ग्रोथ स्नैपशॉट",
+      "viewAnalytics": "एनालिटिक्स देखें ›",
+      "viewAnalyticsA11y": "एनालिटिक्स देखें",
+      "rank": "रैंक",
+      "qrScans": "QR स्कैन",
+      "rating": "रेटिंग",
+      "trend": "इस हफ्ते विज़िबिलिटी बढ़ रही है"
+    },
+    "sidebar": {
+      "dashboard": "डैशबोर्ड",
+      "packages": "सेवा पैकेज",
+      "services": "मेरे पैकेज",
+      "menu-management": "मेरा मेनू",
+      "venue-showcase": "वेन्यू शोकेस",
+      "inventory": "इन्वेंटरी",
+      "new-bookings": "नई बुकिंग",
+      "assignments": "असाइनमेंट",
+      "ranking": "रैंकिंग और परफ़ॉर्मेंस",
+      "earnings": "कमाई",
+      "partner-wallet": "पार्टनर वॉलेट",
+      "onboarded-partners": "ऑनबोर्डेड पार्टनर",
+      "qr-code": "QR कोड",
+      "qr-analytics": "QR एनालिटिक्स",
+      "token-booking": "टोकन बुकिंग",
+      "booking-tracking": "बुकिंग ट्रैकिंग",
+      "home-visit": "होम विज़िट एजेंट",
+      "franchise": "फ्रैंचाइज़ प्रोग्राम",
+      "profile": "प्रोफ़ाइल",
+      "logout": "लॉग आउट"
+    }
   },
   "tabs": {
     "home": "होम",

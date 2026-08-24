@@ -7,10 +7,9 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   Image,
 } from 'react-native';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import type { ChatParticipantRole, ChatRoomScreenProps, Message } from '../types';
 import { useChatMessagesApi } from '../hooks/useChatMessagesApi';
 import { useBackendChatMessaging } from '../hooks/useBackendChatMessaging';
@@ -242,10 +241,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         </View>
       ) : null}
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}>
+      <View style={styles.flex}>
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.primary} />
@@ -276,15 +272,17 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
           </Text>
         ) : null}
 
-        <ChatInput
-          onSend={handleSend}
-          onSendImage={pickImageHandler ? handleSendImage : undefined}
-          onPickImage={pickImageHandler}
-          sending={sending}
-          theme={theme}
-          disabled={composerDisabled}
-        />
-      </KeyboardAvoidingView>
+        <KeyboardStickyView>
+          <ChatInput
+            onSend={handleSend}
+            onSendImage={pickImageHandler ? handleSendImage : undefined}
+            onPickImage={pickImageHandler}
+            sending={sending}
+            theme={theme}
+            disabled={composerDisabled}
+          />
+        </KeyboardStickyView>
+      </View>
     </SafeAreaView>
   );
 };
