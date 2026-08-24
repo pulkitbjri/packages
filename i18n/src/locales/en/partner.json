@@ -16,7 +16,9 @@
     "language": "App language",
     "languageHint": "Choose English or Hindi for the app",
     "publicProfile": "Public profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "languageSection": "Language",
+    "deleteAccount": "Delete Account"
   },
   "auth": {
     "loginTitle": "Partner login",

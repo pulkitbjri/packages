@@ -16,7 +16,9 @@
     "language": "ऐप भाषा",
     "languageHint": "ऐप के लिए अंग्रेज़ी या हिंदी चुनें",
     "publicProfile": "सार्वजनिक प्रोफ़ाइल",
-    "logout": "लॉग आउट"
+    "logout": "लॉग आउट",
+    "languageSection": "भाषा",
+    "deleteAccount": "खाता हटाएँ"
   },
   "auth": {
     "loginTitle": "पार्टनर लॉगिन",
