@@ -194,7 +194,6 @@ const CORE_BOOKING_SIDEBAR: SidebarItemId[] = [
 const SOLO_SERVICE_SIDEBAR: SidebarItemId[] = [
   'dashboard',
   'services',
-  'token-booking',
   'ranking',
   'earnings',
   'onboarded-partners',
@@ -207,7 +206,6 @@ const SOLO_SERVICE_SIDEBAR: SidebarItemId[] = [
 const RETAIL_SIDEBAR: SidebarItemId[] = [
   'dashboard',
   'services',
-  'token-booking',
   'earnings',
   'onboarded-partners',
   'qr-code',
@@ -581,7 +579,7 @@ const ROLE_DEFINITIONS: Record<PartnerRoleCode, PartnerRoleDefinition> = {
     capabilities: ['earnings', 'qr', 'qrAnalytics', 'referrals', 'tokenBooking'],
     tabs: RETAIL_TABS,
     dashboardCards: ['earnings', 'qr-code', 'qr-analytics', 'onboarded-partners'],
-    sidebarItems: ['dashboard', 'token-booking', 'earnings', 'onboarded-partners', 'qr-code', 'qr-analytics', 'profile', 'logout'],
+    sidebarItems: ['dashboard', 'earnings', 'onboarded-partners', 'qr-code', 'qr-analytics', 'profile', 'logout'],
     programs: { homeVisit: false, franchise: false },
   },
 };
