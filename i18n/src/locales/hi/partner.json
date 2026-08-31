@@ -139,6 +139,7 @@
     "verify": "सत्यापित करें",
     "invalidPhoneTitle": "अमान्य फ़ोन नंबर",
     "invalidPhoneMessage": "कृपया मान्य 10-अंकीय भारतीय मोबाइल नंबर दर्ज करें",
+    "phoneRequired": "मोबाइल नंबर ज़रूरी है।",
     "invalidOtpTitle": "अमान्य OTP",
     "invalidOtpMessage": "कृपया मान्य 6-अंकीय OTP दर्ज करें",
     "failedSendOtp": "OTP भेजने में विफल",
@@ -155,7 +156,10 @@
     "empty": "अभी कोई बुकिंग नहीं",
     "accept": "स्वीकार करें",
     "reject": "अस्वीकार करें",
-    "overview": "अवलोकन"
+    "overview": "अवलोकन",
+    "invalidClientPhone": "कृपया क्लाइंट के लिए मान्य 10-अंकीय भारतीय मोबाइल नंबर दर्ज करें।",
+    "mobileRequired": "मोबाइल नंबर ज़रूरी है।",
+    "mobileIncomplete": "सभी 10 अंक दर्ज करें (6–9 से शुरू)।"
   },
   "bookingList": {
     "title": "मेरे असाइनमेंट",

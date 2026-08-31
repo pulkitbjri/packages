@@ -139,6 +139,7 @@
     "verify": "Verify",
     "invalidPhoneTitle": "Invalid Phone Number",
     "invalidPhoneMessage": "Please enter a valid 10-digit Indian mobile number",
+    "phoneRequired": "Mobile number is required.",
     "invalidOtpTitle": "Invalid OTP",
     "invalidOtpMessage": "Please enter a valid 6-digit OTP",
     "failedSendOtp": "Failed to send OTP",
@@ -155,7 +156,10 @@
     "empty": "No bookings yet",
     "accept": "Accept",
     "reject": "Reject",
-    "overview": "Overview"
+    "overview": "Overview",
+    "invalidClientPhone": "Please enter a valid 10-digit Indian mobile number for the client.",
+    "mobileRequired": "Mobile number is required.",
+    "mobileIncomplete": "Enter all 10 digits (starts with 6–9)."
   },
   "bookingList": {
     "title": "My Assignments",
