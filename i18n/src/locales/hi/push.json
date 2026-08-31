@@ -4,5 +4,7 @@
   "homeVisitProposedTitle": "होम विज़िट समय प्रस्तावित",
   "homeVisitProposedBody": "आपके एजेंट ने विज़िट समय प्रस्तावित किए। कृपया देखकर पुष्टि करें।",
   "bookingUpdateTitle": "बुकिंग अपडेट",
-  "bookingUpdateBody": "आपकी बुकिंग में अपडेट है।"
+  "bookingUpdateBody": "आपकी बुकिंग में अपडेट है।",
+  "inAppFallbackTitle": "नई सूचना",
+  "inAppFallbackBody": "नवीनतम अपडेट देखने के लिए टैप करें।"
 }

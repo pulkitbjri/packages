@@ -39,6 +39,11 @@ export { ChatRoomScreen } from './components/ChatRoomScreen';
 export { MessageBubble } from './components/MessageBubble';
 export { ChatInput } from './components/ChatInput';
 export {
+  InAppNotificationHost,
+  showInAppNotification,
+} from './components/InAppNotificationBanner';
+export type { InAppNotificationInput } from './components/InAppNotificationBanner';
+export {
   DEFAULT_CHAT_THEME,
   PARTNER_CHAT_THEME,
   USER_FESTIVE_CHAT_THEME,

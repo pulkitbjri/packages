@@ -4,5 +4,7 @@
   "homeVisitProposedTitle": "Home visit times proposed",
   "homeVisitProposedBody": "Your agent proposed visit times. Please review and confirm.",
   "bookingUpdateTitle": "Booking update",
-  "bookingUpdateBody": "There is an update on your booking."
+  "bookingUpdateBody": "There is an update on your booking.",
+  "inAppFallbackTitle": "New notification",
+  "inAppFallbackBody": "Tap to view the latest update."
 }
