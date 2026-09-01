@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
-import type { ChatParticipantRole, ChatRoomScreenProps, Message } from '../types';
+import type {
+  ChatParticipantRole,
+  ChatRoomScreenProps,
+  Message,
+} from '../types';
 import { useChatMessagesApi } from '../hooks/useChatMessagesApi';
 import { useBackendChatMessaging } from '../hooks/useBackendChatMessaging';
 import { resolveTheme } from './defaultTheme';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
+import {
+  promptReportFlow,
+  showChatModerationMenu,
+} from '../moderationSheets';
 
 function formatRoleCaption(role?: ChatParticipantRole): string | null {
   if (!role) return null;
@@ -39,12 +48,29 @@ function humanizeLockReason(reason: string | null | undefined): string {
   }
 }
 
+async function runModerationAction(
+  label: string,
+  action: () => Promise<void>,
+): Promise<void> {
+  try {
+    await action();
+  } catch (err) {
+    const message =
+      err instanceof Error && err.message.trim()
+        ? err.message
+        : `Could not ${label}. Try again.`;
+    Alert.alert('Something went wrong', message);
+  }
+}
+
 export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   chatId,
   currentUserId,
   otherPartyName,
   otherPartyRole,
   bookingLabel,
+  otherUserId,
+  threadParticipantIds,
   loadMessagesViaApi,
   onBack,
   theme: themeOverride,
@@ -54,6 +80,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   sendError: sendErrorProp,
   otherPartyAvatarUrl,
   onOtherPartyPress,
+  moderation,
 }) => {
   const theme = resolveTheme(themeOverride);
   const [localSendError, setLocalSendError] = useState<string | null>(null);
@@ -66,13 +93,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
 
   const useApiList = Boolean(loadMessagesViaApi?.fetchPage);
 
-  const noopFetch = useCallback(
-    async (): Promise<{
-      messages: Message[];
-      nextCursor: string | null;
-    }> => ({ messages: [], nextCursor: null }),
-    [],
-  );
+  const noopFetch = useCallback(async () => ({ messages: [] as Message[], nextCursor: null as string | null }), []);
 
   const fetchPage = loadMessagesViaApi?.fetchPage ?? noopFetch;
 
@@ -99,21 +120,26 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
       : undefined,
   });
 
-  const messages = apiState.messages;
-  const loading = apiState.loading;
-  const loadMore = apiState.loadMore;
-  const hasMore = apiState.hasMore;
-  const send = messaging.send;
-  const sendImage = messaging.sendImage;
-  const sending = messaging.sending;
-
+  const { messages, loading, loadMore, hasMore } = apiState;
+  const { send, sendImage, sending } = messaging;
   const listRef = useRef<FlatList<Message>>(null);
+
+  const resolvedPeerId = useMemo(() => {
+    const fromRoute = otherUserId?.trim();
+    if (fromRoute) return fromRoute;
+    const others = (threadParticipantIds ?? []).filter(
+      (id) => String(id) !== String(currentUserId) && String(id).trim() !== '',
+    );
+    return others.length === 1 ? String(others[0]) : undefined;
+  }, [otherUserId, threadParticipantIds, currentUserId]);
+
+  const isPeerBlocked = Boolean(moderation?.isPeerBlocked);
+  const canBlock = Boolean(moderation && resolvedPeerId);
+  const composerDisabled = locked || isPeerBlocked;
 
   const handleSend = useCallback(
     async (text: string) => {
-      if (sendErrorProp == null) {
-        setLocalSendError(null);
-      }
+      if (sendErrorProp == null) setLocalSendError(null);
       try {
         await send(text);
       } catch {
@@ -127,9 +153,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
 
   const handleSendImage = useCallback(
     async (localUri: string) => {
-      if (sendErrorProp == null) {
-        setLocalSendError(null);
-      }
+      if (sendErrorProp == null) setLocalSendError(null);
       try {
         await sendImage(localUri);
       } catch {
@@ -141,9 +165,65 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
     [sendImage, sendErrorProp],
   );
 
+  const handleReportPeer = useCallback(() => {
+    if (!moderation) return;
+    promptReportFlow((reason, details) => {
+      void runModerationAction('report', () => moderation.reportPeer(reason, details));
+    });
+  }, [moderation]);
+
+  const handleReportMessage = useCallback(
+    (messageId: string) => {
+      if (!moderation) return;
+      promptReportFlow((reason, details) => {
+        void runModerationAction('report message', () =>
+          moderation.reportMessage(messageId, reason, details),
+        );
+      });
+    },
+    [moderation],
+  );
+
+  const handleOpenMenu = useCallback(() => {
+    if (!moderation) return;
+    showChatModerationMenu({
+      isPeerBlocked,
+      canBlock,
+      onAction: (action) => {
+        if (action === 'report') {
+          handleReportPeer();
+          return;
+        }
+        if (action === 'contact') {
+          moderation.onContactSupport();
+          return;
+        }
+        if (action === 'block') {
+          Alert.alert(
+            'Block this person?',
+            'You will stop seeing their messages in this chat.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Block',
+                style: 'destructive',
+                onPress: () => {
+                  void runModerationAction('block', () => moderation.blockPeer());
+                },
+              },
+            ],
+          );
+          return;
+        }
+        if (action === 'unblock') {
+          void runModerationAction('unblock', () => moderation.unblockPeer());
+        }
+      },
+    });
+  }, [moderation, isPeerBlocked, canBlock, handleReportPeer]);
+
   const roleCaption = formatRoleCaption(otherPartyRole);
   const displayName = otherPartyName?.trim() ? otherPartyName.trim() : 'Chat';
-  const composerDisabled = locked;
   const avatarUrl = otherPartyAvatarUrl?.trim() ? otherPartyAvatarUrl.trim() : null;
   const showHeaderAvatarImage = Boolean(avatarUrl && !headerImgFailed);
 
@@ -158,9 +238,7 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         </Text>
       ) : null}
       {bookingLabel?.trim() ? (
-        <Text
-          style={[styles.headerBooking, { color: theme.textSecondary }]}
-          numberOfLines={1}>
+        <Text style={[styles.headerBooking, { color: theme.textSecondary }]} numberOfLines={1}>
           {bookingLabel.trim()}
         </Text>
       ) : null}
@@ -182,14 +260,22 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: Message }) => (
-      <MessageBubble
-        message={item}
-        isOwn={String(item.senderId) === String(currentUserId)}
-        theme={theme}
-      />
-    ),
-    [currentUserId, theme],
+    ({ item }: { item: Message }) => {
+      const isOwn = String(item.senderId) === String(currentUserId);
+      return (
+        <MessageBubble
+          message={item}
+          isOwn={isOwn}
+          theme={theme}
+          onLongPress={
+            !isOwn && moderation
+              ? () => handleReportMessage(item.messageId)
+              : undefined
+          }
+        />
+      );
+    },
+    [currentUserId, theme, moderation, handleReportMessage],
   );
 
   const keyExtractor = useCallback((item: Message) => item.messageId, []);
@@ -230,11 +316,28 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
             {headerTitleBlock}
           </View>
         )}
-        <View style={styles.headerSpacer} />
+        {moderation ? (
+          <TouchableOpacity
+            onPress={handleOpenMenu}
+            style={styles.menuButton}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            accessibilityLabel="Chat options">
+            <Text style={[styles.menuDots, { color: theme.text }]}>⋮</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
       </View>
 
-      {locked ? (
-        <View style={[styles.lockBanner, { backgroundColor: theme.receivedBubble, borderBottomColor: theme.border }]}>
+      {locked && !isPeerBlocked ? (
+        <View
+          style={[
+            styles.lockBanner,
+            {
+              backgroundColor: theme.receivedBubble,
+              borderBottomColor: theme.border,
+            },
+          ]}>
           <Text style={[styles.lockBannerText, { color: theme.text }]}>
             {humanizeLockReason(lockReason)}
           </Text>
@@ -273,14 +376,37 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
         ) : null}
 
         <KeyboardStickyView>
-          <ChatInput
-            onSend={handleSend}
-            onSendImage={pickImageHandler ? handleSendImage : undefined}
-            onPickImage={pickImageHandler}
-            sending={sending}
-            theme={theme}
-            disabled={composerDisabled}
-          />
+          {isPeerBlocked && moderation ? (
+            <View
+              style={[
+                styles.blockedComposer,
+                { backgroundColor: theme.surface, borderTopColor: theme.border },
+              ]}>
+              <Text style={[styles.blockedText, { color: theme.textSecondary }]}>
+                You blocked this person.
+              </Text>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Unblock user"
+                onPress={() => {
+                  void runModerationAction('unblock', () => moderation.unblockPeer());
+                }}
+                style={[styles.unblockButton, { borderColor: theme.primary }]}>
+                <Text style={[styles.unblockButtonText, { color: theme.primary }]}>
+                  Unblock
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <ChatInput
+              onSend={handleSend}
+              onSendImage={pickImageHandler ? handleSendImage : undefined}
+              onPickImage={pickImageHandler}
+              sending={sending}
+              theme={theme}
+              disabled={composerDisabled}
+            />
+          )}
         </KeyboardStickyView>
       </View>
     </SafeAreaView>
@@ -290,12 +416,8 @@ export const ChatRoomScreen: React.FC<ChatRoomScreenProps> = ({
 const HEADER_RADIUS = 12;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  flex: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  flex: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -303,14 +425,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  backButton: {
-    paddingRight: 8,
-  },
-  backArrow: {
-    fontSize: 32,
-    fontWeight: '300',
-    lineHeight: 34,
-  },
+  backButton: { paddingRight: 8 },
+  backArrow: { fontSize: 32, fontWeight: '300', lineHeight: 34 },
   headerIdentity: {
     flex: 1,
     flexDirection: 'row',
@@ -325,67 +441,49 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerAvatarImage: {
-    backgroundColor: '#E5E7EB',
-  },
-  headerAvatarText: {
-    color: '#FFF',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  headerTextBlock: {
-    flex: 1,
-    minWidth: 0,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  headerRole: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  headerBooking: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  headerSpacer: {
-    width: 32,
-  },
+  headerAvatarImage: { backgroundColor: '#E5E7EB' },
+  headerAvatarText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
+  headerTextBlock: { flex: 1, minWidth: 0 },
+  headerTitle: { fontSize: 17, fontWeight: '600' },
+  headerRole: { fontSize: 12, fontWeight: '600', marginTop: 2 },
+  headerBooking: { fontSize: 12, marginTop: 2 },
+  headerSpacer: { width: 32 },
+  menuButton: { width: 32, alignItems: 'center', justifyContent: 'center' },
+  menuDots: { fontSize: 22, fontWeight: '700', lineHeight: 24 },
   lockBanner: {
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: 1,
   },
-  lockBannerText: {
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  lockBannerText: { fontSize: 13, lineHeight: 18, textAlign: 'center' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 40,
   },
-  emptyText: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  listContent: {
-    paddingVertical: 12,
-  },
+  emptyText: { fontSize: 15, textAlign: 'center', lineHeight: 22 },
+  listContent: { paddingVertical: 12 },
   sendError: {
     fontSize: 12,
     textAlign: 'center',
     paddingHorizontal: 16,
     paddingTop: 4,
   },
+  blockedComposer: {
+    borderTopWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+    gap: 10,
+  },
+  blockedText: { fontSize: 14, textAlign: 'center' },
+  unblockButton: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  unblockButtonText: { fontSize: 14, fontWeight: '600' },
 });

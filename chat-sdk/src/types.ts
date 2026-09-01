@@ -123,6 +123,33 @@ export type ChatLockReason =
   | 'advance_payment_required'
   | (string & {});
 
+/** Shared report reasons — must match backend ModerationConsts.REASONS. */
+export const CHAT_MODERATION_REASONS = [
+  'SPAM',
+  'HARASSMENT',
+  'HATE',
+  'SEXUAL',
+  'SCAM',
+  'OTHER',
+] as const;
+
+export type ChatModerationReason = (typeof CHAT_MODERATION_REASONS)[number];
+
+export const CHAT_MODERATION_DETAILS_MAX = 500;
+
+export type ChatModerationHandlers = {
+  isPeerBlocked?: boolean;
+  reportPeer: (reason: ChatModerationReason, details?: string) => Promise<void>;
+  reportMessage: (
+    messageId: string,
+    reason: ChatModerationReason,
+    details?: string,
+  ) => Promise<void>;
+  blockPeer: () => Promise<void>;
+  unblockPeer: () => Promise<void>;
+  onContactSupport: () => void;
+};
+
 export interface ChatRoomScreenProps {
   chatId: string;
   currentUserId: string;
@@ -152,4 +179,6 @@ export interface ChatRoomScreenProps {
   sendError?: string | null;
   otherPartyAvatarUrl?: string | null;
   onOtherPartyPress?: () => void;
+  /** Optional UGC moderation actions (report / block / contact). */
+  moderation?: ChatModerationHandlers;
 }

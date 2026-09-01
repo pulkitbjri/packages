@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import type { Message, ChatTheme } from '../types';
 
 interface MessageBubbleProps {
@@ -7,6 +7,7 @@ interface MessageBubbleProps {
   isOwn: boolean;
   theme: ChatTheme;
   showSenderName?: boolean;
+  onLongPress?: () => void;
 }
 
 function formatTime(date: Date): string {
@@ -22,6 +23,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   isOwn,
   theme,
   showSenderName = false,
+  onLongPress,
 }) => {
   const bubbleBg = isOwn ? theme.sentBubble : theme.receivedBubble;
   const textColor = isOwn ? theme.sentBubbleText : theme.receivedBubbleText;
@@ -32,7 +34,10 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         styles.wrapper,
         isOwn ? styles.wrapperOwn : styles.wrapperOther,
       ]}>
-      <View
+      <Pressable
+        onLongPress={onLongPress}
+        delayLongPress={350}
+        disabled={!onLongPress}
         style={[
           styles.bubble,
           { backgroundColor: bubbleBg },
@@ -54,7 +59,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         <Text style={[styles.time, { color: isOwn ? 'rgba(255,255,255,0.7)' : theme.timestamp }]}>
           {formatTime(message.createdAt)}
         </Text>
-      </View>
+      </Pressable>
     </View>
   );
 };

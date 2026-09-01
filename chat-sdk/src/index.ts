@@ -14,7 +14,15 @@ export type {
   ChatEventSubscribeFn,
   ChatRealtimeEvent,
   ChatLockReason,
+  ChatModerationReason,
+  ChatModerationHandlers,
 } from './types';
+export {
+  CHAT_MODERATION_REASONS,
+  CHAT_MODERATION_DETAILS_MAX,
+} from './types';
+
+export { promptReportFlow } from './moderationSheets';
 
 export type { ChatMessagesApiNameContext } from './chatMessagesApi';
 export {

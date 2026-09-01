@@ -110,6 +110,13 @@
     "publicProfile": "Public profile",
     "logout": "Log out",
     "languageSection": "Language",
+    "legal": "Legal",
+    "legalTerms": "Terms of Service",
+    "legalTermsSub": "Partner marketplace terms",
+    "legalPrivacy": "Privacy Policy",
+    "legalPrivacySub": "How we use your data",
+    "legalHelp": "Help & Support",
+    "legalHelpSub": "Contact and grievances",
     "deleteAccount": "Delete Account"
   },
   "auth": {
