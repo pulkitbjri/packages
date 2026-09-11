@@ -6,6 +6,7 @@ export {
   trackClick,
   trackStep,
   setUser,
+  updateUserProperties,
   clearUser,
   sanitize,
 } from './engine';
@@ -26,5 +27,6 @@ export {
   AnalyticsEvents,
   Funnels,
   Steps,
+  UserProperties,
   type AnalyticsEventName,
 } from './events';

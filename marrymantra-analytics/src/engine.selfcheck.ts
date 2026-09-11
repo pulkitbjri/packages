@@ -10,6 +10,7 @@ import {
   sanitize,
   trackEvent,
   trackStep,
+  updateUserProperties,
 } from './engine';
 
 function assert(cond: unknown, msg: string): void {
@@ -21,13 +22,19 @@ function assert(cond: unknown, msg: string): void {
 async function main(): Promise<void> {
   const logged: Array<{ name: string; params?: EventParams }> = [];
 
+  let userIdCalls = 0;
+  const propsLog: Array<Record<string, string | null>> = [];
   const mockProvider: AnalyticsProvider = {
     logEvent: async (name, params) => {
       logged.push({ name, params });
     },
     logScreenView: async () => {},
-    setUserId: async () => {},
-    setUserProperties: async () => {},
+    setUserId: async () => {
+      userIdCalls += 1;
+    },
+    setUserProperties: async (props) => {
+      propsLog.push(props);
+    },
     setDefaultEventParameters: async () => {},
   };
 
@@ -64,6 +71,10 @@ async function main(): Promise<void> {
 
   await trackEvent('login_success');
   assert(logged.some((e) => e.name === 'login_success'), 'trackEvent still logs');
+
+  await updateUserProperties({ kyc_status: 'submitted' });
+  assert(propsLog.some((p) => p.kyc_status === 'submitted'), 'updateUserProperties sets props');
+  assert(userIdCalls === 0, 'updateUserProperties must not touch userId');
 
   setTrailKey('last_loader', undefined as unknown as string);
   setTrailKey('last_loader', '');

@@ -159,6 +159,20 @@ export async function setUser(ctx: UserContext): Promise<void> {
   }
 }
 
+/** Property-only update. Does not touch userId or default event params. */
+export async function updateUserProperties(
+  props: Record<string, string | null>,
+): Promise<void> {
+  if (!provider) {
+    return;
+  }
+  try {
+    await provider.setUserProperties(props);
+  } catch {
+    // Never block UX on analytics
+  }
+}
+
 export function clearUser(): void {
   if (!provider) {
     return;

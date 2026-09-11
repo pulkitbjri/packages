@@ -21,6 +21,23 @@ export const AnalyticsEvents = {
   chat_open: 'chat_open',
   chat_send: 'chat_send',
   favorite_toggled: 'favorite_toggled',
+  notification_opened: 'notification_opened',
+  review_submitted: 'review_submitted',
+  review_skipped: 'review_skipped',
+  qr_viewed: 'qr_viewed',
+  qr_share: 'qr_share',
+} as const;
+
+/** User-scoped properties. Register in GA4. Never put user_id here (reserved). */
+export const UserProperties = {
+  user_role: 'user_role',
+  user_city: 'user_city',
+  partner_role: 'partner_role',
+  kyc_status: 'kyc_status',
+  acquisition_source: 'acquisition_source',
+  app_language: 'app_language',
+  wallet_tier: 'wallet_tier',
+  has_booking: 'has_booking',
 } as const;
 
 export type AnalyticsEventName =
@@ -36,6 +53,9 @@ export const Funnels = {
   partner_on_behalf_booking: 'partner_on_behalf_booking',
   partner_kyc: 'partner_kyc',
   partner_assignment: 'partner_assignment',
+  user_wallet: 'user_wallet',
+  user_search: 'user_search',
+  partner_wallet: 'partner_wallet',
 } as const;
 
 export const Steps = {
@@ -87,6 +107,12 @@ export const Steps = {
     payment: 'payment',
     booked: 'booked',
   },
+  partner_auth: {
+    login: 'login',
+    otp_requested: 'otp_requested',
+    otp_verify: 'otp_verify',
+    completed: 'completed',
+  },
   partner_kyc: {
     identity: 'identity',
     bank: 'bank',
@@ -103,5 +129,21 @@ export const Steps = {
     accept: 'accept',
     reject: 'reject',
     collect_advance: 'collect_advance',
+  },
+  user_wallet: {
+    home: 'home',
+    pay: 'pay',
+    confirm: 'confirm',
+    success: 'success',
+    fail: 'fail',
+  },
+  user_search: {
+    enter: 'enter',
+    results: 'results',
+  },
+  partner_wallet: {
+    home: 'home',
+    withdraw: 'withdraw',
+    topup: 'topup',
   },
 } as const;
