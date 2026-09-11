@@ -1,3 +1,4 @@
+import { setCrashUserId, setTrailKey, trailEvent, trailScreen } from './crashTrail';
 import type {
   AnalyticsConfig,
   AnalyticsProvider,
@@ -61,6 +62,9 @@ function deviceDefaults(): EventParams {
 export function init(p: AnalyticsProvider, cfg: AnalyticsConfig): void {
   provider = p;
   config = cfg;
+  if (cfg.appName) {
+    setTrailKey('app_name', cfg.appName);
+  }
   provider.setDefaultEventParameters(deviceDefaults()).catch(() => {});
 }
 
@@ -84,7 +88,9 @@ export async function trackEvent(
     return;
   }
   try {
-    await provider.logEvent(name, sanitize(params));
+    const safe = sanitize(params);
+    trailEvent(name, safe);
+    await provider.logEvent(name, safe);
   } catch {
     // Never block UX on analytics
   }
@@ -98,6 +104,7 @@ export async function trackScreenView(
     return;
   }
   try {
+    trailScreen(name);
     await provider.logScreenView(name, cls);
   } catch {
     // Never block UX on analytics
@@ -139,6 +146,7 @@ export async function setUser(ctx: UserContext): Promise<void> {
   }
   try {
     await provider.setUserId(ctx.userId);
+    setCrashUserId(ctx.userId);
     await provider.setDefaultEventParameters({
       ...deviceDefaults(),
       user_id: ctx.userId ?? 'anonymous',
@@ -156,6 +164,7 @@ export function clearUser(): void {
     return;
   }
   provider.setUserId(null).catch(() => {});
+  setCrashUserId(null);
   provider
     .setDefaultEventParameters({
       ...deviceDefaults(),

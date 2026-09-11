@@ -7,13 +7,17 @@
   "peerDependencies": {
     "react": ">=18",
     "react-native": ">=0.72",
-    "@react-navigation/native": ">=6"
+    "@react-navigation/native": ">=6",
+    "@react-native-firebase/crashlytics": ">=22"
   },
   "peerDependenciesMeta": {
     "@react-native-firebase/analytics": {
       "optional": true
     },
     "@react-native-firebase/app": {
+      "optional": true
+    },
+    "@react-native-firebase/crashlytics": {
       "optional": true
     }
   }

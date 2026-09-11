@@ -3,10 +3,12 @@
  * ponytail: assert-based demo, no test framework required.
  */
 import type { AnalyticsProvider, EventParams } from './types';
+import { setTrailKey } from './crashTrail';
 import {
   __resetAnalyticsForTests,
   init,
   sanitize,
+  trackEvent,
   trackStep,
 } from './engine';
 
@@ -59,6 +61,13 @@ async function main(): Promise<void> {
     next?.params?.flow_id && next.params.flow_id !== enter?.params?.flow_id,
     'new flow_id on next enter',
   );
+
+  await trackEvent('login_success');
+  assert(logged.some((e) => e.name === 'login_success'), 'trackEvent still logs');
+
+  setTrailKey('last_loader', undefined as unknown as string);
+  setTrailKey('last_loader', '');
+  setTrailKey('last_loader', 'ok');
 
   console.log('engine.selfcheck: ok');
 }

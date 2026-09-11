@@ -21,6 +21,7 @@ export {
   createNavigationStateChangeHandler,
   getActiveRouteName,
 } from './navigation';
+export { trail, setTrailKey, setCrashUserId, trailEvent, trailScreen } from './crashTrail';
 export {
   AnalyticsEvents,
   Funnels,
