@@ -55,6 +55,7 @@ export declare const getServiceCodeForRole: (input?: string | null) => PartnerSe
 export declare const roleHasCapability: (input: string | null | undefined, capability: PartnerCapability) => boolean;
 export declare const isProgramEnabledForRole: (input: string | null | undefined, program: keyof ProgramEligibility) => boolean;
 export declare const isAcceptedPaymentPolicyPickerEnabled: (input?: string | null) => boolean;
+export declare const isServicePackageCatalogEnabled: (input?: string | null) => boolean;
 export declare const resolveActivePartnerRoleCode: (storedActiveRole: string | null | undefined, assignedRoles: Array<string | null | undefined>) => PartnerRoleCode;
 export declare const buildPartnerCapabilityManifest: (activeRoleInput?: string | null, assignedRoleInputs?: Array<string | null | undefined>) => PartnerCapabilityManifest;
 export {};

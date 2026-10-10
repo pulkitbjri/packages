@@ -165,7 +165,6 @@ const ROLE_DEFINITIONS = {
         ],
         tabs: CORE_BOOKING_TABS,
         dashboardCards: [
-            'packages',
             'book-for-client',
             'services',
             'venue-showcase',
@@ -177,9 +176,9 @@ const ROLE_DEFINITIONS = {
             'onboarded-partners',
         ],
         sidebarItems: [
-            ...CORE_BOOKING_SIDEBAR.filter((item) => !['inventory', 'home-visit', 'franchise'].includes(item)).slice(0, 3),
+            ...CORE_BOOKING_SIDEBAR.filter((item) => !['packages', 'inventory', 'home-visit', 'franchise'].includes(item)).slice(0, 2),
             'venue-showcase',
-            ...CORE_BOOKING_SIDEBAR.filter((item) => !['inventory', 'home-visit', 'franchise'].includes(item)).slice(3),
+            ...CORE_BOOKING_SIDEBAR.filter((item) => !['packages', 'inventory', 'home-visit', 'franchise'].includes(item)).slice(2),
         ],
         programs: { homeVisit: false, franchise: false },
     },
@@ -542,9 +541,19 @@ const PAYMENT_POLICY_PICKER_ROLE_CODES = [
     'PHOTOGRAPHY_PARTNER',
     'EVENT_MANAGER',
 ];
+const SERVICE_PACKAGE_CATALOG_ROLE_CODES = [
+    'TENT_PARTNER',
+    'CATERING_PARTNER',
+    'PHOTOGRAPHY_PARTNER',
+    'EVENT_MANAGER',
+];
 export const isAcceptedPaymentPolicyPickerEnabled = (input) => {
     const code = normalizePartnerRoleCode(input);
     return code != null && PAYMENT_POLICY_PICKER_ROLE_CODES.includes(code);
+};
+export const isServicePackageCatalogEnabled = (input) => {
+    const code = normalizePartnerRoleCode(input);
+    return code != null && SERVICE_PACKAGE_CATALOG_ROLE_CODES.includes(code);
 };
 export const resolveActivePartnerRoleCode = (storedActiveRole, assignedRoles) => {
     var _a, _b;
@@ -559,6 +568,9 @@ export const buildPartnerCapabilityManifest = (activeRoleInput, assignedRoleInpu
     const assignedRoleCodes = dedupePartnerRoleCodes(assignedRoleInputs.length > 0 ? assignedRoleInputs : [activeRoleInput]);
     const activeRoleCode = resolveActivePartnerRoleCode(activeRoleInput, assignedRoleCodes);
     const definition = applyProgramVisibility(getPartnerRoleDefinition(activeRoleCode));
+    const showPackageCatalog = isServicePackageCatalogEnabled(activeRoleCode);
+    const dashboardCards = withPartnerWalletCard(definition.dashboardCards);
+    const sidebarItems = withPartnerWalletSidebar(definition.sidebarItems);
     return {
         activeRoleCode,
         activeRoleId: definition.id,
@@ -571,8 +583,12 @@ export const buildPartnerCapabilityManifest = (activeRoleInput, assignedRoleInpu
         assignedRoleIds: assignedRoleCodes.map((roleCode) => ROLE_DEFINITIONS[roleCode].id),
         capabilities: withPartnerWalletCapability(definition.capabilities),
         tabs: definition.tabs,
-        dashboardCards: withPartnerWalletCard(definition.dashboardCards),
-        sidebarItems: withPartnerWalletSidebar(definition.sidebarItems),
+        dashboardCards: showPackageCatalog
+            ? dashboardCards
+            : dashboardCards.filter((cardId) => cardId !== 'packages'),
+        sidebarItems: showPackageCatalog
+            ? sidebarItems
+            : sidebarItems.filter((itemId) => itemId !== 'packages'),
         programs: definition.programs,
     };
 };
