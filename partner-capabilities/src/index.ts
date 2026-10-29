@@ -350,6 +350,7 @@ const ROLE_DEFINITIONS: Record<PartnerRoleCode, PartnerRoleDefinition> = {
       'qr-code',
       'qr-analytics',
       'onboarded-partners',
+      'accepted-payment-policies',
     ],
     sidebarItems: [
       ...CORE_BOOKING_SIDEBAR.filter((item) => !['packages', 'inventory', 'home-visit', 'franchise'].includes(item)).slice(0, 2),
@@ -748,6 +749,7 @@ const PAYMENT_POLICY_PICKER_ROLE_CODES: PartnerRoleCode[] = [
   'CATERING_PARTNER',
   'PHOTOGRAPHY_PARTNER',
   'EVENT_MANAGER',
+  'VENUE_PARTNER',
 ];
 
 const SERVICE_PACKAGE_CATALOG_ROLE_CODES: PartnerRoleCode[] = [
